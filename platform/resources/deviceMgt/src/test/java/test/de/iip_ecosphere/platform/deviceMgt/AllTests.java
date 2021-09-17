@@ -20,7 +20,10 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    AppTest.class,
+    DeviceManagementAasTest.class,
+    DeviceRegistryAasTest.class,
+    DeviceRegistryFactoryTest.class,
+    DeviceRegistryAasClientTest.class
 })
 public class AllTests {
 }
