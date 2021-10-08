@@ -1,0 +1,22 @@
+aas:
+    server:
+        port: 9001
+        schema: HTTP
+        host: 127.0.0.1
+        path: aas
+    registry:
+        schema: HTTP
+        host: 127.0.0.1
+        port: 9002
+        path: registry
+    implementation:
+        schema: TCP
+        host: 127.0.0.1
+        port: 8082
+        protocol: VAB-TCP
+    persistence: INMEMORY
+transport:
+    host: localhost
+    port: 8883
+    password: pwd
+    user: user  

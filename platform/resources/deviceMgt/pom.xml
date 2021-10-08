@@ -24,8 +24,9 @@
      <artifactId>transport</artifactId>
      <version>${project.version}</version>
     </dependency>
-    <!-- NO dependency to de.iip-ecosphere.platform.services* or to de.iip-ecosphere.platform.ecsRuntime* !! 
-        services.environment is ok for metrics -->
+
+      <!-- NO dependency to de.iip-ecosphere.platform.services* or to de.iip-ecosphere.platform.ecsRuntime* !!
+          services.environment is ok for metrics -->
 
     <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>
@@ -44,6 +45,12 @@
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
+  <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>3.12.4</version>
+      <scope>test</scope>
+  </dependency>
   </dependencies>
 
 </project>

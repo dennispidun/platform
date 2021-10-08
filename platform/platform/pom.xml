@@ -25,9 +25,14 @@
      <version>${project.version}</version>
     </dependency>
     <dependency>
-     <groupId>de.iip-ecosphere.platform</groupId>
-     <artifactId>ecsRuntime</artifactId>
-     <version>${project.version}</version>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>ecsRuntime</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>deviceMgt</artifactId>
+      <version>${project.version}</version>
     </dependency>
   
     <dependency>

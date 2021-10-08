@@ -15,10 +15,62 @@ package de.iip_ecosphere.platform.deviceMgt;
 public interface DeviceDescriptor {
 
     /**
-     * Gets the id of the device
+     * Gets the resource id of the device.
      *
      * @return the id of the device
      */
     public String getId();
+
+    /**
+     * Gets the internal id of the device. May be the same as resourceId
+     *
+     * @return the managedId of the device
+     */
+    public String getManagedId();
+
+    /**
+     * Gets the ip of the device
+     *
+     * @return the ip of the device
+     */
+    public String getIp();
+
+    /**
+     * Gets the runtime version of the device
+     *
+     * @return the runtime version of the device
+     */
+    public String getRuntimeVersion();
+
+    /**
+     * Gets the runtime name of the device
+     *
+     * @return the runtime name of the device
+     */
+    public String getRuntimeName();
+
+    /**
+     * Gets the identifier of the device
+     *
+     * @return the identifier of the device
+     */
+    public String getResourceId();
+
+    /**
+     * Gets the state of the device
+     *
+     * @return the state of the device
+     */
+    public State getState();
+
+    public enum State {
+
+        STARTING(),
+        AVAILABLE(),
+        STOPPING(),
+        STOPPED(),
+        UNDEFINED(),
+
+    }
 
 }

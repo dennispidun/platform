@@ -35,12 +35,14 @@ public class EcsLifecycleDescriptor extends AbstractAasLifecycleDescriptor {
         super.startup(args);
         NetworkManagerFactory.configure(EcsFactory.getConfiguration().getNetMgr());
         Monitor.startScheduling();
+        DeviceManagement.initializeDevice();
     }
     
     @Override
     public void shutdown() {
         Monitor.stopScheduling();
         EcsAas.notifyResourceRemoved();
+        DeviceManagement.removeDevice();
         super.shutdown();
     }
     

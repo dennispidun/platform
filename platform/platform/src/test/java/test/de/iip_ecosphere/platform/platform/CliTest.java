@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
+import de.iip_ecosphere.platform.deviceMgt.DeviceManagementAasClient;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
@@ -261,6 +262,14 @@ public class CliTest {
         }
         
     }
+
+    private static class DeviceManagementClientFactory implements de.iip_ecosphere.platform.platform.cli.DeviceManagementClientFactory {
+
+        @Override
+        public DeviceManagementAasClient create() throws IOException {
+            return null;
+        }
+    }
     
     /**
      * Accepts and counts error messages.
@@ -304,8 +313,9 @@ public class CliTest {
         ServicesFactory servicesFactory = new ServicesFactory();
         EcsFactory ecsFactory = new EcsFactory();
         ResourcesFactory resourcesFactory = new ResourcesFactory();
+        DeviceManagementClientFactory deviceManagementClientFactory = new DeviceManagementClientFactory();
         ErrorConsumer errorConsumer = new ErrorConsumer();
-        de.iip_ecosphere.platform.platform.Cli.setFactories(servicesFactory, ecsFactory, resourcesFactory);
+        de.iip_ecosphere.platform.platform.Cli.setFactories(servicesFactory, ecsFactory, resourcesFactory, deviceManagementClientFactory);
         de.iip_ecosphere.platform.platform.Cli.setErrorConsumer(errorConsumer);
         
         test(COMPLETE_SEQUENCE, errorConsumer, 0);
@@ -319,7 +329,7 @@ public class CliTest {
         test(SERVICES_FAIL, errorConsumer, 1);
         
         de.iip_ecosphere.platform.platform.Cli.setFactories(ServicesClientFactory.DEFAULT, EcsClientFactory.DEFAULT, 
-            ResourcesClientFactory.DEFAULT);
+            ResourcesClientFactory.DEFAULT, de.iip_ecosphere.platform.platform.cli.DeviceManagementClientFactory.DEFAULT);
         de.iip_ecosphere.platform.platform.Cli.setErrorConsumer(
             de.iip_ecosphere.platform.platform.Cli.DEFAULT_ERROR_CONSUMER);
     }
