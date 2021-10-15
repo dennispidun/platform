@@ -16,6 +16,8 @@ public class Connection implements Runnable {
     private final int remotePort;
     private Socket serverConnection = null;
 
+    private Thread clientServerThread;
+    private Thread serverClientThread;
     private static final Logger LOGGER = LoggerFactory.getLogger(Connection.class);
 
     public Connection(Socket clientsocket, String remoteIp, int remotePort) {
@@ -36,21 +38,26 @@ public class Connection implements Runnable {
 
         LOGGER.info("Proxy {}:{} <-> {}:{}", clientsocket.getInetAddress().getHostName(), clientsocket.getPort(), serverConnection.getInetAddress().getHostName(), serverConnection.getPort());
 
-        new Thread(new Proxy(clientsocket, serverConnection)).start();
-        new Thread(new Proxy(serverConnection, clientsocket)).start();
-        new Thread(() -> {
-            while (true) {
-                if (clientsocket.isClosed()) {
-                    LOGGER.info("client socket ({}:{}) closed", clientsocket.getInetAddress().getHostName(), clientsocket.getPort());
-                    closeServerConnection();
-                    break;
-                }
+        clientServerThread = new Thread(new Proxy(clientsocket, serverConnection));
+        clientServerThread.start();
+        serverClientThread = new Thread(new Proxy(serverConnection, clientsocket));
+        serverClientThread.start();
 
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException ignored) {}
+        while (true) {
+            if (clientsocket.isClosed()) {
+                LOGGER.info("client socket ({}:{}) closed", clientsocket.getInetAddress().getHostName(), clientsocket.getPort());
+                closeServerConnection();
+                break;
             }
-        }).start();
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ignored) {
+                clientServerThread.interrupt();
+                serverClientThread.interrupt();
+            }
+        }
+
     }
 
     private void closeServerConnection() {
@@ -58,6 +65,9 @@ public class Connection implements Runnable {
             try {
                 LOGGER.info("closing remote host connection {}:{}", serverConnection.getInetAddress().getHostName(), serverConnection.getPort());
                 serverConnection.close();
+
+                clientServerThread.interrupt();
+                serverClientThread.interrupt();
             } catch (IOException e) {
                 e.printStackTrace();
             }

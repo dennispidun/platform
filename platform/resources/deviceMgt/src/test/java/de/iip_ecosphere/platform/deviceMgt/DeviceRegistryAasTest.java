@@ -42,6 +42,7 @@ public class DeviceRegistryAasTest {
     public static final String A_VALID_DEVICE = "A_VALID_DEVICE";
     public static final String AN_INVALID_DEVICE = "AN_INVALID_DEVICE";
     public static final String SOME_TELEMETRY_DATA = "{\"someField\": \"someData\"}";
+    public static final String AN_IP = "1.1.1.1";
 
     private Aas aas;
     private Server implServer;
@@ -94,14 +95,31 @@ public class DeviceRegistryAasTest {
     public void op_addDevice_withValidDeviceIdentifier_addsDevice() throws ExecutionException, IOException {
         mockDeviceResource(A_VALID_DEVICE);
         DeviceRegistryAasClient client = new DeviceRegistryAasClient();
-        client.addDevice(A_VALID_DEVICE);
+        client.addDevice(A_VALID_DEVICE, AN_IP);
 
         Set<SubmodelElementCollection> devices = client.getDevices();
         Assert.assertNotNull(devices);
 
         int elementsCount = devices.size();
         Assert.assertEquals(1, elementsCount);
+        SubmodelElementCollection device = devices.stream().findFirst().get();
+        Assert.assertNotNull(device);
+        Property managedId = device.getProperty(DeviceRegistryAas.NAME_PROP_MANAGED_DEVICE_ID);
+        Assert.assertNotNull(managedId);
+        Assert.assertEquals(A_VALID_DEVICE, managedId.getValue());
         AasPartRegistry.retrieveIipAas().accept(new AasPrintVisitor());
+    }
+
+    @Test
+    public void op_addDevice_validDevice_exposesIp() throws IOException, ExecutionException {
+        mockDeviceResource(A_VALID_DEVICE);
+        DeviceRegistryAasClient client = new DeviceRegistryAasClient();
+        client.addDevice(A_VALID_DEVICE, AN_IP);
+
+        SubmodelElementCollection device = client.getDevices().stream().findFirst().get();
+        Property property = device.getProperty(DeviceRegistryAas.NAME_PROP_DEVICE_IP);
+        Assert.assertNotNull(property);
+        Assert.assertEquals(AN_IP, property.getValue());
     }
 
     @Test
@@ -110,7 +128,7 @@ public class DeviceRegistryAasTest {
         DeviceRegistryAasClient client = new DeviceRegistryAasClient();
         int beforeCount = client.getDevices().size();
 
-        client.addDevice(A_VALID_DEVICE);
+        client.addDevice(A_VALID_DEVICE, AN_IP);
 
         // refresh client, as its underlying submodel is outdated
         client = new DeviceRegistryAasClient();
@@ -174,7 +192,7 @@ public class DeviceRegistryAasTest {
     }
 
     @Test
-    public void op_removeDevice_withInvalidDeviceIdentifier_doesNotremoveDevice() throws ExecutionException, IOException {
+    public void op_removeDevice_withInvalidDeviceIdentifier_doesNotRemoveDevice() throws ExecutionException, IOException {
         DeviceRegistryAasClient client = new DeviceRegistryAasClient();
         int beforeCount = client.getDevices().size();
 

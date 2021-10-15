@@ -29,6 +29,7 @@ public class DeviceRegistryAasClientTest {
     public static final String A_DEVICE_ID = "A_DEVICE_ID";
     public static final String AN_INVALID_DEVICE_ID = "AN_INVALID_DEVICE";
     public static final String SOME_TELEMETRY = "{\"testField\": 123}";
+    public static final String AN_IP = "1.1.1.1";
 
     private Server implServer;
     private Server aasServer;
@@ -64,7 +65,7 @@ public class DeviceRegistryAasClientTest {
     @Test
     public void getDevices_withOneDevice_shouldReturnCollectionWithTheOneDevice() throws ExecutionException, IOException {
         DeviceRegistryAasTest.mockDeviceResource(A_DEVICE_ID);
-        client.addDevice(A_DEVICE_ID);
+        client.addDevice(A_DEVICE_ID, AN_IP);
 
         AasPartRegistry.retrieveIipAas().accept(new AasPrintVisitor());
 
@@ -83,7 +84,7 @@ public class DeviceRegistryAasClientTest {
     @Test
     public void getDevice_withValidDevice_shouldNotReturnNull() throws ExecutionException, IOException {
         DeviceRegistryAasTest.mockDeviceResource(A_DEVICE_ID);
-        client.addDevice(A_DEVICE_ID);
+        client.addDevice(A_DEVICE_ID, AN_IP);
 
         client = new DeviceRegistryAasClient();
         SubmodelElementCollection device = client.getDevice(A_DEVICE_ID);
@@ -94,7 +95,7 @@ public class DeviceRegistryAasClientTest {
     @Test
     public void addDevice_withDevice_shouldAddDevice() throws ExecutionException, IOException {
         DeviceRegistryAasTest.mockDeviceResource(A_DEVICE_ID);
-        client.addDevice(A_DEVICE_ID);
+        client.addDevice(A_DEVICE_ID, AN_IP);
 
         client = new DeviceRegistryAasClient();
         Assert.assertNotNull(client.getDevice(A_DEVICE_ID));

@@ -33,6 +33,7 @@ public class DeviceRegistryFactoryTest {
 
     public static final String A_DEVICE_ID = "A_DEVICE_ID";
     public static final String SOME_TELEMETRY = "someTelemetry";
+    public static final String AN_IP = "1.1.1.1";
 
     @After
     public void tearDown() throws Exception {
@@ -67,8 +68,8 @@ public class DeviceRegistryFactoryTest {
         deviceRegistry.removeDevice(A_DEVICE_ID);
         verify(stubRegistry).removeDevice(eq(A_DEVICE_ID));
 
-        deviceRegistry.addDevice(A_DEVICE_ID);
-        verify(stubRegistry).addDevice(eq(A_DEVICE_ID));
+        deviceRegistry.addDevice(A_DEVICE_ID, AN_IP);
+        verify(stubRegistry).addDevice(eq(A_DEVICE_ID), eq(AN_IP));
 
         deviceRegistry.imAlive(A_DEVICE_ID);
         verify(stubRegistry).imAlive(eq(A_DEVICE_ID));

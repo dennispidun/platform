@@ -21,6 +21,7 @@ public class DeviceRegistryAas implements AasContributor {
 
     public static final String NAME_PROP_DEVICE_RESOURCE = "resource";
     public static final String NAME_PROP_MANAGED_DEVICE_ID = "managedId";
+    public static final String NAME_PROP_DEVICE_IP = "ip";
 
     public static final String NAME_OP_DEVICE_ADD = "addDevice";
     public static final String NAME_OP_DEVICE_REMOVE = "removeDevice";
@@ -37,6 +38,7 @@ public class DeviceRegistryAas implements AasContributor {
         registryColl.createOperationBuilder(NAME_OP_DEVICE_ADD)
                 .setInvocable(iCreator.createInvocable(getQName(NAME_OP_DEVICE_ADD)))
                 .addInputVariable("deviceId", Type.STRING)
+                .addInputVariable("deviceIp", Type.STRING)
                 .build();
 
         registryColl.createOperationBuilder(NAME_OP_DEVICE_REMOVE)
@@ -65,7 +67,7 @@ public class DeviceRegistryAas implements AasContributor {
     public void contributeTo(ProtocolServerBuilder sBuilder) {
         sBuilder.defineOperation(getQName(NAME_OP_DEVICE_ADD),
                 new JsonResultWrapper(p -> {
-                    DeviceRegistryFactory.getDeviceRegistry().addDevice(readString(p));
+                    DeviceRegistryFactory.getDeviceRegistry().addDevice(readString(p), readString(p, 1));
                     return null;
                 })
         );
@@ -106,7 +108,7 @@ public class DeviceRegistryAas implements AasContributor {
         return null != DeviceRegistryFactory.getDeviceRegistry();
     }
 
-    public static void notifyDeviceAdded(String internalId, String resId) {
+    public static void notifyDeviceAdded(String internalId, String resId, String ip) {
         ActiveAasBase.processNotification(NAME_SUBMODEL, (sub, aas) -> {
             Submodel.SubmodelBuilder resources = aas.createSubmodelBuilder(NAME_SUBMODEL, null);
             SubmodelElementCollectionBuilder registry = resources
@@ -117,6 +119,10 @@ public class DeviceRegistryAas implements AasContributor {
 
             device.createPropertyBuilder(NAME_PROP_MANAGED_DEVICE_ID)
                     .setValue(Type.STRING, internalId)
+                    .build();
+
+            device.createPropertyBuilder(NAME_PROP_DEVICE_IP)
+                    .setValue(Type.STRING, ip)
                     .build();
 
             device.build();

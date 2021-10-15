@@ -49,8 +49,8 @@ public class DeviceRegistryAasClient extends SubmodelElementsCollectionClient im
     }
 
     @Override
-    public void addDevice(String id) throws ExecutionException {
-        getOperation(DeviceRegistryAas.NAME_OP_DEVICE_ADD).invoke(id);
+    public void addDevice(String id, String ip) throws ExecutionException {
+        getOperation(DeviceRegistryAas.NAME_OP_DEVICE_ADD).invoke(id, ip);
     }
 
     @Override

@@ -46,7 +46,7 @@ public class DeviceManagementFactory {
                     remoteManagementOperations = first.get();
                 } else {
                     LOGGER.error("No DeviceRemoteManagementOperations implementation available, " +
-                            "fall back to default implementation: ApacheSSHD.");
+                            "fall back to default implementation: SSHProxy.");
                     remoteManagementOperations = SshRemoteManagementOperations.getInstance();
                 }
             }

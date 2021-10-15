@@ -4,11 +4,9 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.*;
-import java.net.InetAddress;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
 
+import static de.iip_ecosphere.platform.deviceMgt.ssh.SocketUtils.mockSocket;
 import static org.mockito.Mockito.*;
 
 public class ProxyTest {
@@ -22,11 +20,11 @@ public class ProxyTest {
         Socket outSocket = mockSocket();
 
         // Create mock OutputStreams which collects every byte into an byte array and link it to socket
-        MockOutputStream outputStream = new MockOutputStream();
+        SocketUtils.MockOutputStream outputStream = new SocketUtils.MockOutputStream();
         when(outSocket.getOutputStream()).thenReturn(outputStream);
 
         // Link MockInputStream to socket and send a message
-        when(inSocket.getInputStream()).thenReturn(new MockInputStream(A_MESSAGE));
+        when(inSocket.getInputStream()).thenReturn(new SocketUtils.MockInputStream(A_MESSAGE));
 
         // run the Proxy, the unit under test
         Proxy proxy = new Proxy(inSocket, outSocket);
@@ -40,7 +38,7 @@ public class ProxyTest {
         Socket inSocket = mockSocket();
         Socket outSocket = mockSocket();
 
-        MockOutputStream outputStream = new MockOutputStream();
+        SocketUtils.MockOutputStream outputStream = new SocketUtils.MockOutputStream();
         when(outSocket.getOutputStream()).thenReturn(outputStream);
 
         when(inSocket.getInputStream()).thenReturn(null);
@@ -76,7 +74,7 @@ public class ProxyTest {
         Socket inSocket = mockSocket();
         Socket outSocket = mockSocket();
 
-        MockOutputStream outputStream = new MockOutputStream();
+        SocketUtils.MockOutputStream outputStream = new SocketUtils.MockOutputStream();
         when(outSocket.getOutputStream()).thenReturn(outputStream);
 
         when(inSocket.getInputStream()).thenThrow(new IOException());
@@ -106,53 +104,5 @@ public class ProxyTest {
         verify(mockInputStream, times(0)).read();
     }
 
-    private Socket mockSocket() {
-        Socket inSocket = mock(Socket.class);
-        when(inSocket.getInetAddress()).thenReturn(mock(InetAddress.class));
-        return inSocket;
-    }
 
-    private static class MockOutputStream extends OutputStream {
-
-        private final List<Integer> payload = new ArrayList<>();
-
-        @Override
-        public void write(int i) throws IOException {
-            payload.add(i);
-        }
-
-        public String getAsString() {
-            if (payload.size() == 0) {
-                return null;
-            }
-
-            byte[] bytes = new byte[payload.size()];
-            for (int i = 0; i < payload.size(); i++) {
-                bytes[i] = payload.get(i).byteValue();
-            }
-            return new String(bytes);
-        }
-
-
-    }
-
-    private static class MockInputStream extends InputStream {
-
-        private final String payload;
-        private int index = 0;
-
-        public MockInputStream(String payload) {
-            this.payload = payload;
-        }
-
-        @Override
-        public int read() throws IOException {
-            if (index >= payload.getBytes().length) {
-                return -1;
-            }
-            byte aByte = payload.getBytes()[index];
-            index++;
-            return aByte;
-        }
-    }
 }

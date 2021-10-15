@@ -5,8 +5,8 @@ import java.util.concurrent.ExecutionException;
 public abstract class AbstractDeviceRegistry implements DeviceRegistry {
 
     @Override
-    public void addDevice(String id) throws ExecutionException {
-        DeviceRegistryAas.notifyDeviceAdded(id, id);
+    public void addDevice(String id, String ip) throws ExecutionException {
+        DeviceRegistryAas.notifyDeviceAdded(id, id, ip);
     }
 
     @Override

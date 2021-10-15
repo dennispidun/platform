@@ -1,8 +1,6 @@
 package de.iip_ecosphere.platform.deviceMgt.ssh;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -11,16 +9,15 @@ public class SshProxy implements Runnable {
     private final int remotePort;
     private int port;
 
-    public SshProxy(String remoteIp, int remotePort, int port) {
+    public SshProxy(String remoteIp, int remotePort, int localPort) {
         this.remoteIp = remoteIp;
         this.remotePort = remotePort;
-        this.port = port;
+        this.port = localPort;
     }
 
     public void listen() {
         try {
-            ServerSocket serverSocket = new ServerSocket(port);
-            this.port = serverSocket.getLocalPort();
+            ServerSocket serverSocket = createServerSocket(port);
             while (true) {
                 Socket socket = serverSocket.accept();
                 startThread(new Connection(socket, remoteIp, remotePort));
@@ -28,6 +25,12 @@ public class SshProxy implements Runnable {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    protected ServerSocket createServerSocket(int port) throws IOException {
+        ServerSocket serverSocket = new ServerSocket(port);
+        this.port = serverSocket.getLocalPort();
+        return serverSocket;
     }
 
     private void startThread(Connection connection) {
