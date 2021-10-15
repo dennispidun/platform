@@ -9,17 +9,16 @@ import de.iip_ecosphere.platform.ecsRuntime.EcsAas;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
+import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
-import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -63,12 +62,16 @@ public class DeviceManagementTest {
     }
 
     @Test
-    public void initializeDevice_registersAtRegistry() throws IOException {
+    public void initializeDevice_registersAtRegistry() throws IOException, ExecutionException {
         DeviceManagement.initializeDevice();
 
         SubmodelElementCollection device = DeviceManagement.getRegistryClient()
                 .getDevice(Id.getDeviceIdAas());
         Assert.assertNotNull(device);
+        Assert.assertNotNull(device.getProperty(DeviceRegistryAas.NAME_PROP_DEVICE_IP));
+        Property deviceId = device.getProperty(DeviceRegistryAas.NAME_PROP_MANAGED_DEVICE_ID);
+        Assert.assertNotNull(deviceId);
+        Assert.assertNotNull(deviceId.getValue());
     }
 
     public static class StubDeviceRegistryFactoryDescriptor implements DeviceRegistryFactoryDescriptor {
@@ -105,8 +108,7 @@ public class DeviceManagementTest {
                 }
 
                 @Override
-                public void addDevice(String id) throws ExecutionException {
-
+                public void addDevice(String id, String ip) throws ExecutionException {
                 }
 
                 @Override

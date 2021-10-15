@@ -8,18 +8,16 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
 
 import java.io.IOException;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.util.concurrent.ExecutionException;
 
 public class DeviceManagement {
 
-    private static DeviceRegistryAasClient deviceRegistryAasClient;
     private static RemoteAccessServer remoteAccessServer;
 
     public static DeviceRegistryClient getRegistryClient() throws IOException {
-        if (null == deviceRegistryAasClient) {
-            deviceRegistryAasClient = new DeviceRegistryAasClient();
-        }
-        return deviceRegistryAasClient;
+        return new DeviceRegistryAasClient();
     }
 
     public static RemoteAccessServer getRemoteAccessServer() {
@@ -35,7 +33,14 @@ public class DeviceManagement {
             SubmodelElementCollection device = registryClient.getDevice(Id.getDeviceIdAas());
 
             if (null == device) {
-                registryClient.addDevice(Id.getDeviceIdAas());
+                String ip = "";
+
+                // see https://stackoverflow.com/a/38342964
+                try(final DatagramSocket socket = new DatagramSocket()){
+                    socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
+                    ip = socket.getLocalAddress().getHostAddress();
+                }
+                registryClient.addDevice(Id.getDeviceIdAas(), ip);
             }
 
             RemoteAccessServer remoteAccessServer = getRemoteAccessServer();

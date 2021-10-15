@@ -1,6 +1,5 @@
 package de.iip_ecosphere.platform.ecsRuntime.ssh;
 
-import de.iip_ecosphere.platform.deviceMgt.ssh.edge.TunnelSettingsRepository;
 import de.iip_ecosphere.platform.support.Server;
 import org.apache.sshd.server.SshServer;
 import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
@@ -20,7 +19,7 @@ public class RemoteAccessServer implements Server {
     private SshServer server;
     private boolean started = false;
 
-    private CredentialsManager credentialsManager = new CredentialsManager();;
+    private CredentialsManager credentialsManager = new CredentialsManager();
 
     protected RemoteAccessServer() {
 
@@ -36,10 +35,10 @@ public class RemoteAccessServer implements Server {
         server.setHost(SSH_HOST);
         server.setPort(SSH_PORT);
         server.setKeyPairProvider(new SimpleGeneratorHostKeyProvider(new File("file.ser").toPath()));
-        server.setPasswordAuthenticator((username, password, session) -> {
-            return TunnelSettingsRepository.getInstance().authenticate(username, password);
-        });
-        server.setShellFactory(new ProcessShellFactory("/bin/sh -i -l", "/bin/sh", "-i", "-l")); //
+        server.setPasswordAuthenticator((username, password, session)
+                -> credentialsManager.authenticate(username, password));
+        // only works for Linux-like environments
+        server.setShellFactory(new ProcessShellFactory("/bin/sh -i -l", "/bin/sh", "-i", "-l"));
         try {
             server.start();
             this.started = true;
