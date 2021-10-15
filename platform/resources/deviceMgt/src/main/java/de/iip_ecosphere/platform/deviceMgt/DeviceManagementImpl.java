@@ -24,7 +24,7 @@ public class DeviceManagementImpl implements DeviceManagement {
     }
 
     @Override
-    public SSHConnectionDetails createSSHServer(String id) {
+    public SSHConnectionDetails createSSHServer(String id) throws ExecutionException {
         return SshRemoteManagementOperations.getInstance().createSSHServer(id);
     }
 }
