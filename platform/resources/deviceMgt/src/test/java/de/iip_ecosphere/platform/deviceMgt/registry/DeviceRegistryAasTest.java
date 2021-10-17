@@ -89,6 +89,11 @@ public class DeviceRegistryAasTest {
     }
 
     @Test
+    public void getKind_shouldBeActive() {
+
+    }
+
+    @Test
     public void op_addDevice_withValidDeviceIdentifier_addsDevice() throws ExecutionException, IOException {
         mockDeviceResource(A_VALID_DEVICE);
         DeviceRegistryAasClient client = new DeviceRegistryAasClient();

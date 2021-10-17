@@ -95,7 +95,6 @@ public class DeviceRegistryAasClientTest {
         client.addDevice(A_DEVICE_ID, AN_IP);
         client = new DeviceRegistryAasClient();
         Assert.assertNotNull(client.getDevice(A_DEVICE_ID));
-
     }
 
     @Test

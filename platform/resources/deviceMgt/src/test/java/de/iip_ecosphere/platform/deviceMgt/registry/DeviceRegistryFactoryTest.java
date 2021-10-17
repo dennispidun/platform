@@ -11,6 +11,7 @@
  ********************************************************************************/
 
 package de.iip_ecosphere.platform.deviceMgt.registry;
+import de.iip_ecosphere.platform.deviceMgt.DeviceDescriptor;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 import org.junit.After;
 import org.junit.Assert;
@@ -88,6 +89,20 @@ public class DeviceRegistryFactoryTest {
 
         deviceRegistry.getIds();
         verify(stubRegistry).getIds();
+    }
+
+    @Test
+    public void getDevice_returnsDeviceFromDeviceRegistry() {
+        DeviceRegistry reg = StubDeviceRegistryFactoryDescriptor.mockDeviceRegistry();
+        DeviceDescriptor deviceDescriptor = mock(DeviceDescriptor.class);
+        DeviceDescriptor.State aState = DeviceDescriptor.State.AVAILABLE;
+        when(deviceDescriptor.getState()).thenReturn(aState);
+        when(reg.getDevice(eq(A_DEVICE_ID))).thenReturn(deviceDescriptor);
+
+
+        DeviceDescriptor device = DeviceRegistryFactory.getDeviceRegistry().getDevice(A_DEVICE_ID);
+        Assert.assertEquals(deviceDescriptor, device);
+        Assert.assertEquals(aState, device.getState());
     }
 
     @Test

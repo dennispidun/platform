@@ -64,13 +64,11 @@ public interface DeviceDescriptor {
     State getState();
 
     enum State {
-
         STARTING(),
         AVAILABLE(),
         STOPPING(),
         STOPPED(),
         UNDEFINED(),
-
     }
 
 }
