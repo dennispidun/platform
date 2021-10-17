@@ -14,6 +14,12 @@ package de.iip_ecosphere.platform.deviceMgt.registry;
 
 import java.util.concurrent.ExecutionException;
 
+/**
+ * Partially implements {@link DeviceRegistry} and thus forms
+ * the AAS part of the {@link DeviceRegistry}.
+ *
+ * @author Dennis Pidun, University of Hildesheim
+ */
 public abstract class AbstractDeviceRegistry implements DeviceRegistry {
 
     @Override

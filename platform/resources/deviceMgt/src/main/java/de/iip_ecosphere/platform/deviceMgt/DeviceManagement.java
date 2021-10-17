@@ -12,6 +12,12 @@
 
 package de.iip_ecosphere.platform.deviceMgt;
 
+/**
+ * Summary Interface for {@link DeviceFirmwareOperations}, {@link DeviceResourceConfigOperations}
+ * and {@link DeviceRemoteManagementOperations}.
+ *
+ * @author Dennis Pidun, University of Hildesheim
+ */
 public interface DeviceManagement extends DeviceFirmwareOperations,
         DeviceResourceConfigOperations, DeviceRemoteManagementOperations{
 }

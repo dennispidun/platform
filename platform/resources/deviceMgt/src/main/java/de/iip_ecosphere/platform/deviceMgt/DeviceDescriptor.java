@@ -12,6 +12,13 @@
 
 package de.iip_ecosphere.platform.deviceMgt;
 
+/**
+ * The {@code DeviceDescriptor} is the foundation to describe a specific device.
+ * Implementing {@code DeviceRegistry} Services should provide an implementation
+ * for this interface.
+ *
+ * @author Dennis Pidun, University of Hildesheim
+ */
 public interface DeviceDescriptor {
 
     /**
@@ -63,6 +70,9 @@ public interface DeviceDescriptor {
      */
     State getState();
 
+    /**
+     * The sasic states.
+     */
     enum State {
         STARTING(),
         AVAILABLE(),

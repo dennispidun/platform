@@ -10,7 +10,11 @@ import java.net.Socket;
 import java.net.SocketException;
 
 /**
- * Created by oksuz on 29/10/2017.
+ * A basic transparent proxy implementation, which should be run a thread.
+ *
+ * Main parts were acquired from https://github.com/oksuz/tcp-proxy (MIT)
+ *
+ * @author oksuz, Github on 29/10/2017.
  */
 public class Proxy implements Runnable {
 
@@ -18,11 +22,22 @@ public class Proxy implements Runnable {
     private final Socket in;
     private final Socket out;
 
+    /**
+     * Creates a one-directional proxy between in and out.
+     *
+     * @param in Socket to get the data from
+     * @param out Socket to pump the data into
+     */
     public Proxy(Socket in, Socket out) {
         this.in = in;
         this.out = out;
     }
 
+    /**
+     * This method basically pumps the data from {@code in.getInputStream()}
+     * to {@code out.getOutputStream()}, which creates a one-directional link between
+     * in and out.
+     */
     @Override
     public void run() {
         LOGGER.info("Proxy {}:{} --> {}:{}", in.getInetAddress().getHostName(), in.getPort(), out.getInetAddress().getHostName(), out.getPort());

@@ -25,6 +25,13 @@ import java.io.IOException;
 import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.fixId;
 import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.readString;
 
+/**
+ * A Asset Administration Shell for device registry functionalities.
+ * Mostly called by {@link de.iip_ecosphere.platform.deviceMgt.DeviceManagement} and
+ * devices itself.
+ *
+ * @author Dennis Pidun, University of Hildesheim
+ */
 public class DeviceRegistryAas implements AasContributor {
 
     public static final String NAME_SUBMODEL = AasPartRegistry.NAME_SUBMODEL_RESOURCES;
@@ -40,6 +47,13 @@ public class DeviceRegistryAas implements AasContributor {
     public static final String NAME_OP_IM_ALIVE = "imAlive";
     public static final String NAME_OP_SEND_TELEMETRY = "sendTelemetry";
 
+    /**
+     * Basically registers the aas for the device registry.
+     *
+     * @param aasBuilder the aasBuilder to contributeTo
+     * @param iCreator an InvocablesCreator
+     * @return null
+     */
     @Override
     public Aas contributeTo(Aas.AasBuilder aasBuilder, InvocablesCreator iCreator) {
         Submodel.SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
@@ -75,6 +89,11 @@ public class DeviceRegistryAas implements AasContributor {
         return null;
     }
 
+    /**
+     * Defines the operations details.
+     *
+     * @param sBuilder the ProtocolServerBuilder
+     */
     @Override
     public void contributeTo(ProtocolServerBuilder sBuilder) {
         sBuilder.defineOperation(getQName(NAME_OP_DEVICE_ADD),
@@ -110,31 +129,47 @@ public class DeviceRegistryAas implements AasContributor {
         return NAME_COLL_DEVICE_REGISTRY + "_" + name;
     }
 
+    /**
+     * This aas is a {@code Kind.ACTIVE}.
+     * @return Kind.ACTIVE.
+     */
     @Override
     public Kind getKind() {
         return Kind.ACTIVE;
     }
 
+    /**
+     * In case this code is used as library one doesn't want that the aas is setup.
+     * @return {@code true} if code based is not used as a library and the aas should be deployed.
+     */
     @Override
     public boolean isValid() {
         return null != DeviceRegistryFactory.getDeviceRegistry();
     }
 
-    public static void notifyDeviceAdded(String internalId, String resId, String ip) {
+    /**
+     * Notify the DeviceRegistryAas if a device was added, so it can
+     * manage and build dynamic parts for this device.
+     *
+     * @param managedId the internal/managed id, could be the same as resourceId
+     * @param resourceId the resource id
+     * @param resourceIp the ip address of the resource
+     */
+    public static void notifyDeviceAdded(String managedId, String resourceId, String resourceIp) {
         ActiveAasBase.processNotification(NAME_SUBMODEL, (sub, aas) -> {
             Submodel.SubmodelBuilder resources = aas.createSubmodelBuilder(NAME_SUBMODEL, null);
             SubmodelElementCollectionBuilder registry = resources
                     .createSubmodelElementCollectionBuilder(NAME_COLL_DEVICE_REGISTRY, false, false);
 
             SubmodelElementCollectionBuilder device = resources
-                .createSubmodelElementCollectionBuilder(fixId(resId), false, false);
+                .createSubmodelElementCollectionBuilder(fixId(resourceId), false, false);
 
             device.createPropertyBuilder(NAME_PROP_MANAGED_DEVICE_ID)
-                    .setValue(Type.STRING, internalId)
+                    .setValue(Type.STRING, managedId)
                     .build();
 
             device.createPropertyBuilder(NAME_PROP_DEVICE_IP)
-                    .setValue(Type.STRING, ip)
+                    .setValue(Type.STRING, resourceIp)
                     .build();
 
             device.build();
@@ -143,14 +178,21 @@ public class DeviceRegistryAas implements AasContributor {
         });
     }
 
-    public static void notifyDeviceRemoved(String id) {
+    /**
+     * Notify the DeviceRegistryAas if a device was removed, so it can
+     * remove entries of the managed device.
+     *
+     * @param resourceId the id of the resource
+     */
+    public static void notifyDeviceRemoved(String resourceId) {
         ActiveAasBase.processNotification(NAME_SUBMODEL, (sub, aas) -> {
             try {
                 DeviceRegistryAasClient client = new DeviceRegistryAasClient();
-                SubmodelElementCollection device = client.getDevice(id);
+                SubmodelElementCollection device = client.getDevice(fixId(resourceId));
 
-                sub.getSubmodelElementCollection(fixId(id))
-                    .deleteElement(NAME_PROP_MANAGED_DEVICE_ID);
+                // SubmodelElementCollection device = sub.getSubmodelElementCollection(fixId(id));
+                device.deleteElement(NAME_PROP_MANAGED_DEVICE_ID);
+                device.deleteElement(NAME_PROP_DEVICE_IP);
             } catch (IOException e) {
                 e.printStackTrace();
             }

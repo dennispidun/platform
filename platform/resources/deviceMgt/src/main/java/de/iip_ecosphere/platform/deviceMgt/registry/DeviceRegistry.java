@@ -18,9 +18,9 @@ import java.util.Collection;
 import java.util.Set;
 
 /**
- * A service provider interface for registering devices in the IIP-Ecosphere platform.
+ * A place to interact with and locate registered devices.
  *
- * @author Dennis Pidun, Universireturn null;ty of Hildesheim
+ * @author Dennis Pidun, University of Hildesheim
  */
 public interface DeviceRegistry extends DeviceRegistryOperations {
 

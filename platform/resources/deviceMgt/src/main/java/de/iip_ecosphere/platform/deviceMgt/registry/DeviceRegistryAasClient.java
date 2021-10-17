@@ -24,6 +24,12 @@ import java.util.stream.StreamSupport;
 
 import static de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper.fromJson;
 
+/**
+ * An AasClient which implements a {@link SubmodelElementsCollectionClient} and provides easy
+ * access to the registry functions through the aas.
+ *
+ * @author Dennis Pidun, University of Hildesheim
+ */
 public class DeviceRegistryAasClient extends SubmodelElementsCollectionClient
         implements DeviceRegistryClient {
 

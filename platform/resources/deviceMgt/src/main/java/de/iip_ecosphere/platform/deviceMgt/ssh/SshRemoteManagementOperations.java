@@ -22,6 +22,12 @@ import de.iip_ecosphere.platform.support.aas.Property;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
+/**
+ * A service provider implementation for {@link DeviceRemoteManagementOperations} which
+ * uses ssh as the communication protocol.
+ *
+ * @author Dennis Pidun, University of Hildesheim
+ */
 public class SshRemoteManagementOperations implements DeviceRemoteManagementOperations {
 
     @Override

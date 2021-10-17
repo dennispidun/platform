@@ -14,12 +14,40 @@ package de.iip_ecosphere.platform.deviceMgt.registry;
 
 import java.util.concurrent.ExecutionException;
 
+/**
+ * A service provider interface for registering devices in the IIP-Ecosphere platform
+ * and interact with them.
+ *
+ * All methods listed here are intended to be called by the devices via aas.
+ *
+ * @author Dennis Pidun, University of Hildesheim
+ */
 public interface DeviceRegistryOperations {
 
+    /**
+     * Register a specific device, which can be used for on-boarding.
+     *
+     * @param id the id of the new device
+     * @param ip the ip of the new device
+     * @throws ExecutionException if the operation fails
+     */
     void addDevice(String id, String ip) throws ExecutionException;
 
+    /**
+     * Removes a registered device, which can be used for off-boarding.
+     *
+     * @param id the id of the new device
+     * @throws ExecutionException if the operation fails
+     */
     void removeDevice(String id) throws ExecutionException;
 
+    /**
+     * Send a heartbeat to device management.
+     * Should be called in a 10-30 seconds interval by the device.
+     *
+     * @param id the id of the new device
+     * @throws ExecutionException if the operation fails
+     */
     void imAlive(String id) throws ExecutionException;
 
     void sendTelemetry(String id, String telemetryData) throws ExecutionException;

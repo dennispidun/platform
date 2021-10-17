@@ -16,12 +16,21 @@ import java.util.concurrent.ExecutionException;
 
 import static org.mockito.Mockito.mock;
 
+/**
+ * Stub Service Implementation for {@link DeviceManagement}
+ *
+ * @author Dennis Pidun, University of Hildesheim
+ */
 public class StubDeviceManagement implements DeviceManagement {
 
     private static DeviceRemoteManagementOperations managementOperationsStub;
     private static DeviceFirmwareOperations firmwareOperationsStub;
     private static DeviceResourceConfigOperations resourceConfigOperationsStub;
 
+    /**
+     * Creates or gets the firmwareOperations mock.
+     * @return the mock
+     */
     static DeviceFirmwareOperations mockFirmwareOperations() {
         if (firmwareOperationsStub == null) {
             firmwareOperationsStub = mock(DeviceFirmwareOperations.class);
@@ -29,6 +38,10 @@ public class StubDeviceManagement implements DeviceManagement {
         return firmwareOperationsStub;
     }
 
+    /**
+     * Creates or gets the resourceConfigOperations mock.
+     * @return the mock
+     */
     static DeviceResourceConfigOperations mockResourceConfigOperations() {
         if (resourceConfigOperationsStub == null) {
             resourceConfigOperationsStub = mock(DeviceResourceConfigOperations.class);
@@ -36,6 +49,10 @@ public class StubDeviceManagement implements DeviceManagement {
         return resourceConfigOperationsStub;
     }
 
+    /**
+     * Creates or gets the remoteManagementOperations mock.
+     * @return the mock
+     */
     static DeviceRemoteManagementOperations mockRemoteManagementOperations() {
         if (managementOperationsStub == null) {
             managementOperationsStub = mock(DeviceRemoteManagementOperations.class);

@@ -12,16 +12,31 @@
 
 package de.iip_ecosphere.platform.deviceMgt.registry;
 
-import de.iip_ecosphere.platform.support.aas.Submodel;
-import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 
 import java.util.Set;
 
+/**
+ * A DeviceRegistryClient is used for easy access to the DeviceRegistry.
+ * Moreover, it adds some methods, so one can obtain the aas Devices and the
+ * aas Device.
+ *
+ * @author Dennis Pidun, University of Hildesheim
+ */
 public interface DeviceRegistryClient extends DeviceRegistryOperations {
 
+    /**
+     * Collects all aas devices into a set.
+     * @return a set of SubmodelElementCollections which contain information about the devices.
+     */
     public Set<SubmodelElementCollection> getDevices();
 
+    /**
+     * Get a specific device.
+     *
+     * @param resourceId the resourceId the device is on
+     * @return a SubmodelElementCollection containing information about the device
+     */
     public SubmodelElementCollection getDevice(String resourceId);
 
 }

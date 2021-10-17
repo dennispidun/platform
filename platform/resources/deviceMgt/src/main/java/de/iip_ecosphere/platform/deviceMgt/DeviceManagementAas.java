@@ -26,6 +26,12 @@ import java.util.concurrent.ExecutionException;
 
 import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.readString;
 
+/**
+ * A Asset Administration Shell for device management functionalities.
+ * Mostly called by northbound services. A device should not rely on these functionalities.
+ *
+ * @author Dennis Pidun, University of Hildesheim
+ */
 public class DeviceManagementAas implements AasContributor {
 
     public static final String NAME_SUBMODEL = AasPartRegistry.NAME_SUBMODEL_RESOURCES;
@@ -36,6 +42,13 @@ public class DeviceManagementAas implements AasContributor {
 
     public static final String ECS_UPDATE_URI = "https://an.uri.local";
 
+    /**
+     * Basically registers the aas for the device management.
+     *
+     * @param aasBuilder the aasBuilder to contributeTo
+     * @param iCreator an InvocablesCreator
+     * @return null
+     */
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
         Submodel.SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
@@ -65,6 +78,11 @@ public class DeviceManagementAas implements AasContributor {
         return null;
     }
 
+    /**
+     * Defines the operations details.
+     *
+     * @param sBuilder the ProtocolServerBuilder
+     */
     @Override
     public void contributeTo(ProtocolServerBuilder sBuilder) {
         sBuilder.defineOperation(getQName(NAME_OP_UPDATE_RUNTIME),
@@ -93,6 +111,14 @@ public class DeviceManagementAas implements AasContributor {
             }));
     }
 
+    /**
+     * Notify the aas if a new config should be set.
+     * This method will redirect the request to the aas of the resource id.
+     *
+     * @param id the device id
+     * @param downloadUri the download uri
+     * @param location the location to put the configuration relative to /
+     */
     public static void notifySetConfig(String id, String downloadUri, String location) {
         ActiveAasBase.processNotification(AasPartRegistry.NAME_SUBMODEL_RESOURCES, (sub, aas) -> {
             try {
@@ -105,6 +131,11 @@ public class DeviceManagementAas implements AasContributor {
         });
     }
 
+    /**
+     * Notify if a device needs an update and redirect the request.
+     *
+     * @param id the device id
+     */
     public static void notifyUpdateRuntime(String id) {
         ActiveAasBase.processNotification(AasPartRegistry.NAME_SUBMODEL_RESOURCES, (sub, aas) -> {
             try {
@@ -121,12 +152,19 @@ public class DeviceManagementAas implements AasContributor {
         return NAME_SUBMODEL + "_" + name;
     }
 
-
+    /**
+     * This aas is a {@code Kind.ACTIVE}.
+     * @return Kind.ACTIVE.
+     */
     @Override
     public Kind getKind() {
         return Kind.ACTIVE;
     }
 
+    /**
+     * In case this code is used as library one doesn't want that the aas is setup.
+     * @return {@code true} if code based is not used as a library and the aas should be deployed.
+     */
     @Override
     public boolean isValid() {
         return null != DeviceManagementFactory.getDeviceManagement() || null != DeviceRegistryFactory.getDeviceRegistry();

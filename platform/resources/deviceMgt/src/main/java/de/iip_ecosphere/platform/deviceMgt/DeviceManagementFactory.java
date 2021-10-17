@@ -19,6 +19,26 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
+/**
+ * The DeviceManagementFactory is capable of creating the DeviceManagement.
+ * It uses the ServiceLoader so new functionality can be added easily.
+ *
+ * In case there are no service providers for the operations default implementations
+ * will be used. E.g.:
+ * <ul>
+ *     <li>
+ *         {@link AasDeviceFirmwareOperations}
+ *     </li>
+ *     <li>
+ *         {@link AasDeviceResourceConfigOperations}
+ *     </li>
+ *     <li>
+ *         {@link SshRemoteManagementOperations}
+ *     </li>
+ * </ul>
+ *
+ * @author Dennis Pidun, University of Hildesheim
+ */
 public class DeviceManagementFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DeviceManagementFactory.class.getName());
@@ -74,7 +94,8 @@ public class DeviceManagementFactory {
     }
 
     /**
-     * [testing]
+     * Resets the device management to its default state.
+     * Used for testing only.
      */
     protected static void resetDeviceManagement() {
         management = null;

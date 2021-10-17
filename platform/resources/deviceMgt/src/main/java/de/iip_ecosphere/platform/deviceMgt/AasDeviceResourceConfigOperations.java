@@ -14,6 +14,13 @@ package de.iip_ecosphere.platform.deviceMgt;
 
 import java.util.concurrent.ExecutionException;
 
+/**
+ * A service provider implementation for {@link DeviceResourceConfigOperations} which
+ * uses aas as the communication protocol. For this purpose it will notify the
+ * DeviceManagementAas that a specific configuration should be set on a device.
+ *
+ * @author Dennis Pidun, University of Hildesheim
+ */
 public class AasDeviceResourceConfigOperations implements DeviceResourceConfigOperations {
 
     public static final String A_CONFIG_DOWNLOAD_URI = "A_CONFIG_DOWNLOAD_URI";

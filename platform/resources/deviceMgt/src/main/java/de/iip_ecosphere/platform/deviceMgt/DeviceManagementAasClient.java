@@ -22,10 +22,19 @@ import java.util.concurrent.ExecutionException;
 
 import static de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper.fromJson;
 
-
+/**
+ * An AasClient which implements a {@link SubmodelElementsCollectionClient} and provides easy
+ * access to the registry functions through the aas.
+ *
+ * @author Dennis Pidun, University of Hildesheim
+ */
 public class DeviceManagementAasClient extends SubmodelElementsCollectionClient
         implements DeviceFirmwareOperations, DeviceRemoteManagementOperations, DeviceResourceConfigOperations {
 
+    /**
+     * Default constructor.
+     * @throws IOException if the resource submodel could not be found
+     */
     public DeviceManagementAasClient() throws IOException {
         super(DeviceRegistryAas.NAME_SUBMODEL, DeviceManagementAas.NAME_COLL_DEVICE_MANAGER);
     }

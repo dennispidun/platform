@@ -18,6 +18,12 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
+/**
+ * The DeviceRegistryFactory is capable of creating the DeviceRegistry.
+ * It uses the ServiceLoader so new functionality can be added easily.
+ *
+ * @author Dennis Pidun, University of Hildesheim
+ */
 public class DeviceRegistryFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DeviceRegistryFactory.class.getName());
@@ -25,6 +31,12 @@ public class DeviceRegistryFactory {
     private static DeviceRegistryFactoryDescriptor desc;
     private static DeviceRegistryProxy proxy;
 
+    /**
+     * Gets or creates a DeviceRegistry using the first found service provider implementations for
+     * {@link DeviceRegistryFactoryDescriptor}, which is able to create the instance.
+     *
+     * @return a DeviceRegistry or null if no {@link DeviceRegistryFactoryDescriptor} is found
+     */
     public static DeviceRegistry getDeviceRegistry() {
         if (null == desc) {
             Optional<DeviceRegistryFactoryDescriptor> first = ServiceLoaderUtils
@@ -45,6 +57,9 @@ public class DeviceRegistryFactory {
         return proxy;
     }
 
+    /**
+     * Resets the factory. Only meant for testing!
+     */
     static void resetDeviceRegistryFactory() {
         desc = null;
         proxy = null;

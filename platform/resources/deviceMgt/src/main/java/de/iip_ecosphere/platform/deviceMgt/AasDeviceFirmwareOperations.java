@@ -14,6 +14,13 @@ package de.iip_ecosphere.platform.deviceMgt;
 
 import java.util.concurrent.ExecutionException;
 
+/**
+ * A service provider implementation for {@link DeviceFirmwareOperations} which
+ * uses aas as the communication protocol. For this purpose it will notify the
+ * DeviceManagementAas that a device needs an update.
+ *
+ * @author Dennis Pidun, University of Hildesheim
+ */
 public class AasDeviceFirmwareOperations implements DeviceFirmwareOperations {
     @Override
     public void updateRuntime(String id) throws ExecutionException {

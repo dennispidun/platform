@@ -32,6 +32,9 @@ import static de.iip_ecosphere.platform.deviceMgt.registry.StubDeviceRegistryFac
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
+/**
+ * Tests the {@link DeviceRegistryAas} with the help of {@link DeviceRegistryAasClient}
+ */
 public class DeviceRegistryAasClientTest {
 
     private final static Class contributorClass = DeviceRegistryAas.class;
@@ -44,6 +47,10 @@ public class DeviceRegistryAasClientTest {
     private Server aasServer;
     private DeviceRegistryAasClient client;
 
+    /**
+     * Setup method, create aas server/registry and deploy the DeviceRegistryAas contributor class
+     * @throws Exception should not be thrown
+     */
     @Before
     public void setUp() throws Exception {
         ActiveAasBase.setNotificationMode(ActiveAasBase.NotificationMode.SYNCHRONOUS);
@@ -59,18 +66,29 @@ public class DeviceRegistryAasClientTest {
         client = new DeviceRegistryAasClient();
     }
 
+    /**
+     * teardown method, reset mocks
+     */
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         // reset Mocks, as Implementation build DeviceRegistry only once
         // otherwise old invocations-counter won't reset
         Mockito.reset(mockDeviceRegistry());
     }
 
+    /**
+     * Test getDevices, assert that devices-list is empty with no devices
+     */
     @Test
     public void getDevices_withNoDevices_shouldReturnEmptyCollection() {
         Assert.assertEquals(0, client.getDevices().size());
     }
 
+    /**
+     * Test getDevices, assert that devices-list has one device with added device
+     * @throws ExecutionException should not be thrown
+     * @throws IOException should not be thrown
+     */
     @Test
     public void getDevices_withOneDevice_shouldReturnCollectionWithTheOneDevice() throws ExecutionException, IOException {
         DeviceRegistryAasTest.mockDeviceResource(A_DEVICE_ID);
@@ -85,11 +103,17 @@ public class DeviceRegistryAasClientTest {
         Assert.assertNotNull(client.getDevice(A_DEVICE_ID));
     }
 
+    /**
+     * test getDevice, check that an invalid device is not registered
+     */
     @Test
     public void getDevice_withInvalidDevice_shouldReturnNull() {
         Assert.assertNull(client.getDevice(AN_INVALID_DEVICE_ID));
     }
 
+    /**
+     * test getDevice, check that a valid device is registered
+     */
     @Test
     public void getDevice_withValidDevice_shouldNotReturnNull() throws ExecutionException, IOException {
         DeviceRegistryAasTest.mockDeviceResource(A_DEVICE_ID);
@@ -101,6 +125,12 @@ public class DeviceRegistryAasClientTest {
         Assert.assertNotNull(device.getProperty(DeviceRegistryAas.NAME_PROP_MANAGED_DEVICE_ID).getValue());
     }
 
+    /**
+     * Test addDevice and provide a valid device. Should add the device.
+     *
+     * @throws ExecutionException should not be thrown
+     * @throws IOException should not be thrown
+     */
     @Test
     public void addDevice_withDevice_shouldAddDevice() throws ExecutionException, IOException {
         DeviceRegistryAasTest.mockDeviceResource(A_DEVICE_ID);
@@ -116,6 +146,12 @@ public class DeviceRegistryAasClientTest {
         verify(mockRegistry).sendTelemetry(eq(A_DEVICE_ID), eq(SOME_TELEMETRY));
     }
 
+    /**
+     * Test the imAlive method and verify that its sending the incomping aas operation
+     * request to the registered device registry.
+     *
+     * @throws ExecutionException should not be thrown
+     */
     @Test
     public void imAlive_withDevice_shouldCallImAliveFromRegistry() throws ExecutionException {
         DeviceRegistry mockRegistry = mockDeviceRegistry();

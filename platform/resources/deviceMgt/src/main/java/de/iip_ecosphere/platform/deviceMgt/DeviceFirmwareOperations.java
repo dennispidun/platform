@@ -14,8 +14,19 @@ package de.iip_ecosphere.platform.deviceMgt;
 
 import java.util.concurrent.ExecutionException;
 
+/**
+ * A service provider interface for DeviceFirmwareOperations.
+ * Can be used to update the Runtime of a specific device.
+ *
+ * @author Dennis Pidun, University of Hildesheim
+ */
 public interface DeviceFirmwareOperations {
 
+    /**
+     * Update the runtime of the given device with the id.
+     * @param id the id of the device
+     * @throws ExecutionException if the execution of this operation fails
+     */
     public void updateRuntime(String id) throws ExecutionException;
 
 }

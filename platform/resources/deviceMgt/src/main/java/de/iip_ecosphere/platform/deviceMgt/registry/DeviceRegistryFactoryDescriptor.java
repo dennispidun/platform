@@ -12,6 +12,17 @@
 
 package de.iip_ecosphere.platform.deviceMgt.registry;
 
+/**
+ * A service provider interface which is capable of creating device registries.
+ * This service provider is loaded by {@link DeviceRegistryFactory}.
+ *
+ * @author Dennis Pidun, University of Hildesheim
+ */
 public interface DeviceRegistryFactoryDescriptor {
+
+    /**
+     * Create a new DeviceRegistry instance.
+     * @return a new {@link DeviceRegistry}
+     */
     public DeviceRegistry createDeviceRegistryInstance();
 }
