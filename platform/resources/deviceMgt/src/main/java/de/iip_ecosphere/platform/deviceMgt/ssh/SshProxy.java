@@ -38,6 +38,14 @@ public class SshProxy implements Runnable {
         t.start();
     }
 
+    public String getRemoteIp() {
+        return remoteIp;
+    }
+
+    public int getRemotePort() {
+        return remotePort;
+    }
+
     public int getPort() {
         return port;
     }
