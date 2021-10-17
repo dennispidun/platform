@@ -4,11 +4,11 @@ import java.util.concurrent.ExecutionException;
 
 public interface DeviceRegistryOperations {
 
-    public void addDevice(String id, String ip) throws ExecutionException;
+    void addDevice(String id, String ip) throws ExecutionException;
 
-    public void removeDevice(String id) throws ExecutionException;
+    void removeDevice(String id) throws ExecutionException;
 
-    public void imAlive(String id) throws ExecutionException;
+    void imAlive(String id) throws ExecutionException;
 
-    public void sendTelemetry(String id, String telemetryData) throws ExecutionException;
+    void sendTelemetry(String id, String telemetryData) throws ExecutionException;
 }

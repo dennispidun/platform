@@ -13,42 +13,48 @@
 package de.iip_ecosphere.platform.deviceMgt;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
-import de.iip_ecosphere.platform.deviceMgt.DeviceManagementAasClient;
+import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryAasClient;
+import de.iip_ecosphere.platform.deviceMgt.registry.StubDeviceRegistryFactoryDescriptor;
+import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
+import org.junit.*;
 
 import de.iip_ecosphere.platform.support.aas.*;
-import de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper;
-import de.iip_ecosphere.platform.deviceMgt.DeviceManagementAas;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import static de.iip_ecosphere.platform.deviceMgt.registry.StubDeviceRegistryFactoryDescriptor.mockDeviceRegistry;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
+
 /**
- * Tests the {@link DeviceManagementAas}.
+ * Tests the {@link DeviceManagementAas} with respect to {@link DeviceManagementAasClient}.
  * 
  * @author Dennis Pidun, University of Hildesheim
  */
 @RunWith(MockitoJUnitRunner.class)
 public class DeviceManagementAasTest {
 
-    public static final String A_DEVICE = "A_DEVICE";
+    public static final String A_DEVICE_ID = "A_DEVICE";
+    public static final String A_DEVICE_IP = "A_DEVICE_IP";
+    public static final String A_CONFIG_PATH = "A_CONFIG_PATH";
+    public static final String A_CONFIG_DOWNLOAD_URI = AasDeviceResourceConfigOperations.A_CONFIG_DOWNLOAD_URI;
+    public static final String A_LOCATION = AasDeviceResourceConfigOperations.A_LOCATION;
+
     private static Aas aas;
     private static Server implServer;
     private static Server aasServer;
 
-    @Captor
-    ArgumentCaptor<JsonResultWrapper.ExceptionFunction> exceptionFunctionArgumentCaptor;
+    private static MockedStatic<ServiceLoaderUtils> serviceLoader;
 
     /**
      * Initializes the test.
@@ -62,6 +68,8 @@ public class DeviceManagementAasTest {
         aasServer = AasPartRegistry.deploy(res.getAas());
         aasServer.start();
         aas = AasPartRegistry.retrieveIipAas();
+
+        ActiveAasBase.setNotificationMode(ActiveAasBase.NotificationMode.SYNCHRONOUS);
     }
     
     /**
@@ -72,15 +80,55 @@ public class DeviceManagementAasTest {
         implServer.stop(false);
         aasServer.stop(false);
     }
-    
+
+    /**
+     * Test teardown method, basically resets all mocks
+     * and the service loader mechanism
+     *
+     * @throws Exception shouldn't be thrown
+     */
+    @After
+    public void tearDown() throws Exception {
+        Mockito.reset(mockDeviceRegistry());
+        Mockito.reset(StubDeviceManagement.mockFirmwareOperations());
+        Mockito.reset(StubDeviceManagement.mockResourceConfigOperations());
+        Mockito.reset(StubEcsAas.createRemoteConnectionCredentialsMock);
+        Mockito.reset(StubEcsAas.updateRuntimeMock);
+        Mockito.reset(StubEcsAas.setConfigMock);
+        if (serviceLoader != null && !serviceLoader.isClosed()) {
+            serviceLoader.close();
+            DeviceManagementFactory.resetDeviceManagement();
+        }
+
+        AasPartRegistry.retrieveIipAas().accept(new AasPrintVisitor());
+    }
+
+    /**
+     * Test setup method
+     *
+     * @throws Exception shouldn't be thrown
+     */
+    @Before
+    public void setUp() throws Exception {
+        AasPartRegistry.retrieveIipAas().accept(new AasPrintVisitor());
+    }
+
+    /**
+     * Tests if the AasContributorClass is loaded
+     */
     @Test
     public void init_contributorClassLoads() {
         Assert.assertTrue(AasPartRegistry.contributorClasses().contains(DeviceManagementAas.class));
     }
 
+    /**
+     * Tests if the AasContributor is deployed
+     *
+     * @throws IOException shouldn't be thrown
+     */
     @Test
-    public void init_contributedAasIsDeployed() {
-        aas.accept(new AasPrintVisitor());
+    public void init_contributedAasIsDeployed() throws IOException {
+        AasPartRegistry.retrieveIipAas().accept(new AasPrintVisitor());
 
         Submodel resourcesSubmodel = aas.getSubmodel(AasPartRegistry.NAME_SUBMODEL_RESOURCES);
         Assert.assertNotNull(resourcesSubmodel);
@@ -89,46 +137,323 @@ public class DeviceManagementAasTest {
         Assert.assertNotNull(deviceManager);
     }
 
-//    ECS AAS lässt sich nicht so einfach "wegmocken": TODO: klären, ob dies sinnvoll beim Testen ist.
-//    @Test
-//    public void op_updateRuntime_shouldTriggerUpdate() throws IOException, URISyntaxException, ExecutionException {
-//        DeviceManagementAasClient client = new DeviceManagementAasClient();
-//
-//        URI expectedUri = new URI(DeviceManagementAas.ECS_UPDATE_URI);
-//        Capture capture = new Capture();
-//        mockDeviceResourceWithUpdateOperation(A_DEVICE, capture);
-//
-//        client.updateRuntime(A_DEVICE);
-//        AasPartRegistry.retrieveIipAas().accept(new AasPrintVisitor());
-//        Assert.assertEquals(expectedUri, capture.getValue());
-//    }
-//
-//    public static void mockDeviceResourceWithUpdateOperation(String aDeviceId,
-//                                                             Capture capture)
-//            throws IOException {
-//
-//        AasPartRegistry.retrieveIipAas().getSubmodel(AasPartRegistry.NAME_SUBMODEL_RESOURCES)
-//            .createSubmodelElementCollectionBuilder(aDeviceId, false, false)
-//                .createOperationBuilder("updateRuntime")
-//                .addInputVariable("location", Type.ANY_URI)
-//                .setInvocable((objects -> {
-//                    System.out.println("Hello");
-//                    return null;
-//                }))
-//                .build();
-//
-//    }
-//
-//    private static final class Capture {
-//        private Object value;
-//
-//        public Object getValue() {
-//            return value;
-//        }
-//
-//        public void setValue(Object value) {
-//            this.value = value;
-//        }
-//    }
+    /**
+     * Tests if the kind is set to active
+     */
+    @Test
+    public void getKind_shouldBeActive() {
+        AasContributor.Kind kind = new DeviceManagementAas().getKind();
+        Assert.assertEquals(AasContributor.Kind.ACTIVE, kind);
+    }
 
+    /**
+     * Tests if the AAS Operation "updateRuntime" won't update the
+     * runtime on an invalid device through internal aas deviceManagement.
+     *
+     * It is using the default implementation for runtime management (eg. AAS connection)
+     * @throws IOException shouldn't be thrown
+     * @throws ExecutionException shouldn't be thrown
+     */
+    @Test
+    public void op_updateRuntime_withInvalidDeviceAndAasDevManager_wontUpdateRuntime() throws IOException, ExecutionException {
+        unloadFirmwareOperations();
+
+        new DeviceManagementAasClient().updateRuntime(A_DEVICE_ID);
+
+        verify(StubEcsAas.updateRuntimeMock, times(0)).apply(any());
+    }
+
+    /**
+     * Tests if the AAS Operation "updateRuntime" updates the runtime
+     * on a valid device through internal aas deviceManagement.
+     *
+     * It is using the default implementation for runtime management (eg. AAS connection)
+     * @throws IOException shouldn't be thrown
+     * @throws ExecutionException shouldn't be thrown
+     */
+    @Test
+    public void op_updateRuntime_withValidDeviceAndAasDevManager_updatesRuntimeOnDevice()
+            throws IOException, ExecutionException {
+        // Make Device available in Registry and make it a managed device
+        makeDeviceAvailable();
+
+        // ServiceLoader loads StubDeviceManagement, but we want to test
+        // the default Implementation if ServiceLoader cant find any
+        unloadFirmwareOperations();
+
+        new DeviceManagementAasClient().updateRuntime(A_DEVICE_ID);
+
+        verify(StubEcsAas.updateRuntimeMock, times(1))
+                .apply(eq(new String[]{DeviceManagementAas.ECS_UPDATE_URI}));
+    }
+
+    /**
+     * Tests if the AAS Operation "updateRuntime" won't update the
+     * runtime on an invalid device.
+     *
+     * It is using a third party implementation for runtime management
+     * @throws IOException shouldn't be thrown
+     * @throws ExecutionException shouldn't be thrown
+     */
+    @Test
+    public void op_updateRuntime_withInvalidDeviceAndLoadedDevManager_wontUpdateRuntime() throws IOException, ExecutionException {
+        DeviceFirmwareOperations deviceFirmwareOperations = StubDeviceManagement.mockFirmwareOperations();
+
+        new DeviceManagementAasClient().updateRuntime(A_DEVICE_ID);
+
+        verify(deviceFirmwareOperations, never()).updateRuntime(eq(A_DEVICE_ID));
+    }
+
+    /**
+     * Tests if the AAS Operation "updateRuntime" updates the
+     * runtime on a valid device.
+     *
+     * It is using a third party implementation for runtime management
+     * @throws IOException shouldn't be thrown
+     * @throws ExecutionException shouldn't be thrown
+     */
+    @Test
+    public void op_updateRuntime_withValidDeviceAndLoadedDevManager_updatesRuntimeOnDevice() throws IOException, ExecutionException {
+        DeviceFirmwareOperations deviceFirmwareOperations = StubDeviceManagement.mockFirmwareOperations();
+
+        // Make Device available in Registry and make it a managed device
+        makeDeviceAvailable();
+
+        new DeviceManagementAasClient().updateRuntime(A_DEVICE_ID);
+
+        verify(deviceFirmwareOperations, times(1)).updateRuntime(eq(A_DEVICE_ID));
+    }
+
+    /**
+     * Tests if the AAS Operation "setConfig" won't set the config
+     * on an invalid device through internal aas DeviceManagement.
+     *
+     * It is using the default implementation for configuration
+     * management (eg. AAS connection)
+     * @throws IOException shouldn't be thrown
+     * @throws ExecutionException shouldn't be thrown
+     */
+    @Test
+    public void op_setConfig_withInvalidDeviceAndAasDevManager_wontSetConfig() throws IOException, ExecutionException {
+        unloadFirmwareOperations();
+
+        new DeviceManagementAasClient().setConfig(A_DEVICE_ID, A_CONFIG_PATH);
+
+        verify(StubEcsAas.setConfigMock, times(0)).apply(any());
+    }
+
+    /**
+     * Tests if the AAS Operation "setConfig" set the config
+     * on a valid device through internal aas DeviceManagement.
+     *
+     * It is using the default implementation for configuration
+     * management (eg. AAS connection)
+     * @throws IOException shouldn't be thrown
+     * @throws ExecutionException shouldn't be thrown
+     */
+    @Test
+    public void op_setConfig_withValidDeviceAndAasDevManager_setsConfigOnDevice()
+            throws IOException, ExecutionException {
+        makeDeviceAvailable();
+        unloadResourceConfigOperations();
+
+        new DeviceManagementAasClient().setConfig(A_DEVICE_ID, A_CONFIG_PATH);
+
+        verify(StubEcsAas.setConfigMock, times(1))
+                .apply(eq(new String[]{A_CONFIG_DOWNLOAD_URI, A_LOCATION}));
+    }
+
+    /**
+     * Tests if the AAS Operation "setConfig" won't set the config
+     * on an invalid device.
+     *
+     * It is using a third party implementation for configuration management
+     * @throws IOException shouldn't be thrown
+     * @throws ExecutionException shouldn't be thrown
+     */
+    @Test
+    public void op_setConfig_withInvalidDeviceAndLoadedDevManager_wontSetConfig() throws IOException, ExecutionException {
+        DeviceResourceConfigOperations configOperations = StubDeviceManagement
+                .mockResourceConfigOperations();
+
+        // missing makeDeviceAvailable() does the effect: the device is no managed device then
+
+        new DeviceManagementAasClient().setConfig(A_DEVICE_ID, A_CONFIG_PATH);
+
+        verify(configOperations, never()).setConfig(eq(A_DEVICE_ID), eq(A_CONFIG_PATH));
+    }
+
+    /**
+     * Tests if the AAS Operation "setConfig" sets the config
+     * on a valid device.
+     *
+     * It is using a third party implementation for configuration management
+     * @throws IOException shouldn't be thrown
+     * @throws ExecutionException shouldn't be thrown
+     */
+    @Test
+    public void op_setConfig_withValidDeviceAndLoadedDevManager_setsConfigOnDevice() throws IOException, ExecutionException {
+        DeviceResourceConfigOperations configOperations = StubDeviceManagement
+                .mockResourceConfigOperations();
+        makeDeviceAvailable();
+
+        new DeviceManagementAasClient().setConfig(A_DEVICE_ID, A_CONFIG_PATH);
+
+        verify(configOperations, times(1))
+                .setConfig(eq(A_DEVICE_ID), eq(A_CONFIG_PATH));
+    }
+
+    /**
+     * Tests if the AAS Operation "establishSSH" returns valid
+     * ssh details under the condition that a real device is
+     * given, which responses with a valid result.
+     *
+     * It is using a third party implementation for ssh servers
+     * @throws IOException shouldn't be thrown
+     * @throws ExecutionException shouldn't be thrown
+     */
+    @Test
+    public void op_establishSsh_withValidDeviceAndLoadedDevManager_createsConnectionDetails() throws IOException, ExecutionException {
+        DeviceRemoteManagementOperations deviceRemoteManagementOperations =
+                StubDeviceManagement.mockRemoteManagementOperations();
+        DeviceRemoteManagementOperations.SSHConnectionDetails expectedConnectionDetails
+                = new DeviceRemoteManagementOperations.SSHConnectionDetails(
+                A_DEVICE_IP,
+                1234,
+                "username",
+                "password"
+        );
+        when(deviceRemoteManagementOperations.establishSsh(eq(A_DEVICE_ID)))
+                .thenReturn(expectedConnectionDetails);
+
+        DeviceRemoteManagementOperations.SSHConnectionDetails connectionDetails
+                = new DeviceManagementAasClient().establishSsh(A_DEVICE_ID);
+
+        verify(deviceRemoteManagementOperations, times(1))
+                .establishSsh(eq(A_DEVICE_ID));
+        Assert.assertEquals(expectedConnectionDetails, connectionDetails);
+
+    }
+
+    /**
+     * Tests if the AAS Operation "establishSSH" returns valid
+     * connection details under the condition that its a valid
+     * device and using the default implementation.
+     *
+     * It is using the default implementation for ssh servers (proxy <-> apachesshd)
+     * @throws IOException shouldn't be thrown
+     * @throws ExecutionException shouldn't be thrown
+     */
+    @Test
+    public void op_establishSsh_withValidDeviceAndDefaultDevManager_letsDeviceCreateCredentials() throws IOException, ExecutionException {
+        unloadRemoteAccessOperations();
+        makeDeviceAvailable();
+        DeviceRemoteManagementOperations.SSHConnectionDetails expectedConnectionDetails
+                = new DeviceRemoteManagementOperations.SSHConnectionDetails(
+                A_DEVICE_IP,
+                5555,
+                "username",
+                "password"
+        );
+        when(StubEcsAas.createRemoteConnectionCredentialsMock.apply(any()))
+                .thenReturn("{\"key\": \"username\", \"secret\": \"password\"}");
+
+        DeviceRemoteManagementOperations.SSHConnectionDetails connectionDetails =
+                new DeviceManagementAasClient().establishSsh(A_DEVICE_ID);
+
+        verify(StubEcsAas.createRemoteConnectionCredentialsMock, times(1))
+                .apply(eq(new String[]{}));
+        Assert.assertEquals(expectedConnectionDetails, connectionDetails);
+    }
+
+    /**
+     * Tests if the AAS Operation "establishSSH" returns null
+     * under the condition that a real device is given, which
+     * responses with an invalid result.
+     *
+     * It is using the default implementation for ssh servers (proxy <-> apachesshd)
+     * @throws IOException shouldn't be thrown
+     * @throws ExecutionException shouldn't be thrown
+     */
+    @Test
+    public void op_establishSsh_withValidDeviceAndInvalidDeviceResponse_returnsNull() throws IOException, ExecutionException {
+        unloadRemoteAccessOperations();
+        makeDeviceAvailable();
+
+        when(StubEcsAas.createRemoteConnectionCredentialsMock.apply(any()))
+                .thenReturn("{\"jsonWithoutTheRightKeys\": \"some_nonesense\", \"anotherField\": \"anotherValue\"}");
+
+        DeviceRemoteManagementOperations.SSHConnectionDetails connectionDetails =
+                new DeviceManagementAasClient().establishSsh(A_DEVICE_ID);
+
+        verify(StubEcsAas.createRemoteConnectionCredentialsMock, times(1))
+                .apply(eq(new String[]{}));
+
+        Assert.assertNull(connectionDetails);
+    }
+
+    /**
+     * Removes loaded FirmwareOperations from ServiceLoaderMechanism
+     *
+     * Uses static mocks for this process, which should be avoided,
+     * but needed in this case.
+     */
+    static void unloadFirmwareOperations() {
+        serviceLoader = mockStatic(ServiceLoaderUtils.class);
+        serviceLoader.when(() -> ServiceLoaderUtils.findFirst(DeviceFirmwareOperations.class))
+                .thenReturn(Optional.empty());
+        resetDeviceManagement();
+    }
+
+    /**
+     * Removes loaded ResourceConfigOperations from ServiceLoaderMechanism
+     *
+     * Uses static mocks for this process, which should be avoided,
+     * but needed in this case.
+     */
+    static void unloadResourceConfigOperations() {
+        serviceLoader = mockStatic(ServiceLoaderUtils.class);
+        serviceLoader.when(() -> ServiceLoaderUtils.findFirst(DeviceResourceConfigOperations.class))
+                .thenReturn(Optional.empty());
+        resetDeviceManagement();
+    }
+
+    /**
+     * Removes loaded RemoteAccessOperations from ServiceLoaderMechanism
+     *
+     * Uses static mocks for this process, which should be avoided,
+     * but needed in this case.
+     */
+    static void unloadRemoteAccessOperations() {
+        serviceLoader = mockStatic(ServiceLoaderUtils.class);
+        serviceLoader.when(() -> ServiceLoaderUtils.findFirst(DeviceRemoteManagementOperations.class))
+                .thenReturn(Optional.empty());
+        resetDeviceManagement();
+    }
+
+    /**
+     * Registers a device and turns it into a managed device
+     * Uses mock DeviceRegistry.
+     *
+     * @throws ExecutionException shouldn't be thrown
+     * @throws IOException shouldn't be thrown
+     */
+    static void makeDeviceAvailable() throws ExecutionException, IOException {
+        new DeviceRegistryAasClient().addDevice(StubEcsAas.A_DEVICE, A_DEVICE_IP);
+        // No actual DeviceRegistry is present: make Device visible
+        DeviceDescriptor mockDevice = mock(DeviceDescriptor.class);
+        when(StubDeviceRegistryFactoryDescriptor.mockDeviceRegistry().getDevice(eq(A_DEVICE_ID)))
+                .thenReturn(mockDevice);
+    }
+
+    private static void resetDeviceManagement() {
+        DeviceManagementFactory.resetDeviceManagement();
+        DeviceManagementFactory.getDeviceManagement();
+    }
+
+    private SubmodelElementCollection deviceManagement() throws IOException {
+        return AasPartRegistry.retrieveIipAas()
+                .getSubmodel(AasPartRegistry.NAME_SUBMODEL_RESOURCES)
+                .getSubmodelElementCollection(DeviceManagementAas.NAME_COLL_DEVICE_MANAGER);
+    }
 }

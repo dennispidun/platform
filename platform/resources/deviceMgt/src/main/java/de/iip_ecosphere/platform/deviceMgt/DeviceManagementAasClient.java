@@ -23,7 +23,8 @@ import java.util.concurrent.ExecutionException;
 import static de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper.fromJson;
 
 
-public class DeviceManagementAasClient extends SubmodelElementsCollectionClient implements DeviceFirmwareOperations, DeviceRemoteManagementOperations {
+public class DeviceManagementAasClient extends SubmodelElementsCollectionClient
+        implements DeviceFirmwareOperations, DeviceRemoteManagementOperations, DeviceResourceConfigOperations {
 
     public DeviceManagementAasClient() throws IOException {
         super(DeviceRegistryAas.NAME_SUBMODEL, DeviceManagementAas.NAME_COLL_DEVICE_MANAGER);
@@ -35,17 +36,22 @@ public class DeviceManagementAasClient extends SubmodelElementsCollectionClient 
     }
 
     @Override
-    public SSHConnectionDetails createSSHServer(String id) throws ExecutionException {
-        Object operationResult = getOperation(DeviceManagementAas.NAME_OP_ESTABLISH_SSH).invoke(id);
-        String result = fromJson(operationResult);
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            SSHConnectionDetails connectionDetails = mapper.readValue(result, SSHConnectionDetails.class);
-            System.out.println(connectionDetails);
-            return connectionDetails;
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return null;
+    public SSHConnectionDetails establishSsh(String id) throws ExecutionException {
+        String operationResult = (String) getOperation(DeviceManagementAas.NAME_OP_ESTABLISH_SSH).invoke(id);
+        SSHConnectionDetails connectionDetails = null;
+        if (operationResult != null) {
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                connectionDetails = mapper.readValue(operationResult, SSHConnectionDetails.class);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
         }
+        return connectionDetails;
+    }
+
+    @Override
+    public void setConfig(String id, String configPath) throws ExecutionException {
+        getOperation(DeviceManagementAas.NAME_OP_SET_CONFIG).invoke(id, configPath);
     }
 }

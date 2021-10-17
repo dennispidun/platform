@@ -1,4 +1,4 @@
-package de.iip_ecosphere.platform.deviceMgt;
+package de.iip_ecosphere.platform.deviceMgt.registry;
 
 import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistry;
 import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryFactoryDescriptor;
@@ -9,7 +9,7 @@ public class StubDeviceRegistryFactoryDescriptor implements DeviceRegistryFactor
 
     private static DeviceRegistry stub;
 
-    static DeviceRegistry mockDeviceRegistry() {
+    public static DeviceRegistry mockDeviceRegistry() {
         if (stub == null) {
             stub = mock(DeviceRegistry.class);
         }

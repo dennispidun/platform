@@ -16,6 +16,10 @@ import static de.iip_ecosphere.platform.support.iip_aas.AasUtils.*;
 
 import java.util.concurrent.ExecutionException;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import de.iip_ecosphere.platform.ecsRuntime.ssh.RemoteAccessServer;
+import de.iip_ecosphere.platform.ecsRuntime.ssh.RemoteAccessServerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,6 +69,8 @@ public class EcsAas implements AasContributor {
     public static final String NAME_OP_CONTAINER_STOP = "stopContainer";
     public static final String NAME_OP_CONTAINER_START = "startContainer";
 
+    public static final String NAME_OP_CREATE_REMOTE_CONNECTION_CREDENTIALS = "createRemoteConnectionCredentials";
+
     private static final String ID_SUBMODEL = null; // take the short name, shall become public and an URN later
     
     @Override
@@ -100,6 +106,12 @@ public class EcsAas implements AasContributor {
             .addInputVariable("url", Type.STRING)
             .addOutputVariable("result", Type.STRING)
             .build();
+
+        jB.createOperationBuilder(NAME_OP_CREATE_REMOTE_CONNECTION_CREDENTIALS)
+                .setInvocable(iCreator.createInvocable(getQName(NAME_OP_CREATE_REMOTE_CONNECTION_CREDENTIALS)))
+                .addOutputVariable("username", Type.STRING)
+                .addOutputVariable("password", Type.STRING)
+                .build();
 
         jB.build();
 
@@ -154,6 +166,21 @@ public class EcsAas implements AasContributor {
                 return EcsFactory.getContainerManager().addContainer(readUri(p, 0, EMPTY_URI)); 
             }
         ));
+
+        sBuilder.defineOperation(getQName(NAME_OP_CREATE_REMOTE_CONNECTION_CREDENTIALS),
+            p -> {
+                RemoteAccessServer.Credentials credentials = RemoteAccessServerFactory.create()
+                        .getCredentialsManager()
+                        .addGeneratedCredentials();
+                ObjectMapper mapper = new ObjectMapper();
+                String result = null;
+                try {
+                    result = mapper.writeValueAsString(credentials);
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+                return result;
+            });
         //MetricsAasConstructor.addMetricsProtocols(sBuilder, Monitor.getMetricsProvider(), null, s -> getQName(s));
     }
 

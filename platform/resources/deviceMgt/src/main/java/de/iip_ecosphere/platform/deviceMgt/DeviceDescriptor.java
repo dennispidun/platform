@@ -19,51 +19,51 @@ public interface DeviceDescriptor {
      *
      * @return the id of the device
      */
-    public String getId();
+    String getId();
 
     /**
      * Gets the internal id of the device. May be the same as resourceId
      *
      * @return the managedId of the device
      */
-    public String getManagedId();
+    String getManagedId();
 
     /**
      * Gets the ip of the device
      *
      * @return the ip of the device
      */
-    public String getIp();
+    String getIp();
 
     /**
      * Gets the runtime version of the device
      *
      * @return the runtime version of the device
      */
-    public String getRuntimeVersion();
+    String getRuntimeVersion();
 
     /**
      * Gets the runtime name of the device
      *
      * @return the runtime name of the device
      */
-    public String getRuntimeName();
+    String getRuntimeName();
 
     /**
      * Gets the identifier of the device
      *
      * @return the identifier of the device
      */
-    public String getResourceId();
+    String getResourceId();
 
     /**
      * Gets the state of the device
      *
      * @return the state of the device
      */
-    public State getState();
+    State getState();
 
-    public enum State {
+    enum State {
 
         STARTING(),
         AVAILABLE(),

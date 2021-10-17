@@ -113,6 +113,9 @@ public class RemoteAccessServer implements Server {
             this.secret = secret;
         }
 
+        public Credentials() {
+        }
+
         public String getKey() {
             return key;
         }

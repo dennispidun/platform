@@ -10,20 +10,25 @@
  ********************************************************************************/
 package de.iip_ecosphere.platform.deviceMgt;
 
+import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryAasClientTest;
+import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryAasTest;
+import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryFactoryTest;
+import de.iip_ecosphere.platform.deviceMgt.ssh.ProxyTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 /**
  * Defines the tests to be executed.
  * 
- * @author Holger Eichelberger, SSE
+ * @author Dennis Pidun, University of Hildesheim
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     DeviceManagementAasTest.class,
     DeviceRegistryAasTest.class,
     DeviceRegistryFactoryTest.class,
-    DeviceRegistryAasClientTest.class
+    DeviceRegistryAasClientTest.class,
+    ProxyTest.class
 })
 public class AllTests {
 }

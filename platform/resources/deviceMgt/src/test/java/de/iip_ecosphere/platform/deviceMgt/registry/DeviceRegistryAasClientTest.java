@@ -1,8 +1,5 @@
-package de.iip_ecosphere.platform.deviceMgt;
+package de.iip_ecosphere.platform.deviceMgt.registry;
 
-import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistry;
-import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryAas;
-import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryAasClient;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
@@ -19,7 +16,7 @@ import org.mockito.Mockito;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
-import static de.iip_ecosphere.platform.deviceMgt.StubDeviceRegistryFactoryDescriptor.mockDeviceRegistry;
+import static de.iip_ecosphere.platform.deviceMgt.registry.StubDeviceRegistryFactoryDescriptor.mockDeviceRegistry;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
@@ -96,7 +93,6 @@ public class DeviceRegistryAasClientTest {
     public void addDevice_withDevice_shouldAddDevice() throws ExecutionException, IOException {
         DeviceRegistryAasTest.mockDeviceResource(A_DEVICE_ID);
         client.addDevice(A_DEVICE_ID, AN_IP);
-
         client = new DeviceRegistryAasClient();
         Assert.assertNotNull(client.getDevice(A_DEVICE_ID));
 

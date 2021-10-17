@@ -32,4 +32,9 @@ public class DeviceRegistryFactory {
 
         return proxy;
     }
+
+    static void resetDeviceRegistryFactory() {
+        desc = null;
+        proxy = null;
+    }
 }

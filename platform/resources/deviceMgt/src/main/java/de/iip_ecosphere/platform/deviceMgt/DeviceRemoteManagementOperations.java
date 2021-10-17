@@ -1,10 +1,11 @@
 package de.iip_ecosphere.platform.deviceMgt;
 
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 public interface DeviceRemoteManagementOperations {
 
-    public SSHConnectionDetails createSSHServer(String id) throws ExecutionException;
+    SSHConnectionDetails establishSsh(String id) throws ExecutionException;
 
     class SSHConnectionDetails {
 
@@ -56,13 +57,14 @@ public interface DeviceRemoteManagementOperations {
         }
 
         @Override
-        public String toString() {
-            return "SSHConnectionDetails{" +
-                    "host='" + host + '\'' +
-                    ", port=" + port +
-                    ", username='" + username + '\'' +
-                    ", password='" + password + '\'' +
-                    '}';
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            SSHConnectionDetails that = (SSHConnectionDetails) o;
+            return host.equals(that.host)
+                    && port.equals(that.port)
+                    && username.equals(that.username)
+                    && password.equals(that.password);
         }
     }
 }

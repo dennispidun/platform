@@ -43,7 +43,7 @@ class DeviceRegistryProxy extends AbstractDeviceRegistry {
 
     @Override
     public Set<String> getManagedIds() {
-        return sink.getIds();
+        return sink.getManagedIds();
     }
 
     @Override
@@ -58,6 +58,6 @@ class DeviceRegistryProxy extends AbstractDeviceRegistry {
 
     @Override
     public DeviceDescriptor getDeviceByManagedId(String id) {
-        return null;
+        return sink.getDeviceByManagedId(id);
     }
 }

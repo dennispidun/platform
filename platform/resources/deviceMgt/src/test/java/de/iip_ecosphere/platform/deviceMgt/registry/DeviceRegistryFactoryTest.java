@@ -10,18 +10,19 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.deviceMgt;
-import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistry;
-import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryFactory;
+package de.iip_ecosphere.platform.deviceMgt.registry;
+import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import java.util.Collections;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
-import static de.iip_ecosphere.platform.deviceMgt.StubDeviceRegistryFactoryDescriptor.mockDeviceRegistry;
+import static de.iip_ecosphere.platform.deviceMgt.registry.StubDeviceRegistryFactoryDescriptor.mockDeviceRegistry;
 import static org.mockito.Mockito.*;
 
 /**
@@ -34,6 +35,7 @@ public class DeviceRegistryFactoryTest {
     public static final String A_DEVICE_ID = "A_DEVICE_ID";
     public static final String SOME_TELEMETRY = "someTelemetry";
     public static final String AN_IP = "1.1.1.1";
+    public static final String A_SECRET = "A_SECRET";
 
     @After
     public void tearDown() throws Exception {
@@ -52,6 +54,7 @@ public class DeviceRegistryFactoryTest {
         DeviceRegistry dReg = DeviceRegistryFactory.getDeviceRegistry();
         Assert.assertTrue(dReg.getIds().contains(A_DEVICE_ID));
     }
+
 
     // ignore VAB-Exception: ProviderException, this test does not focus on AAS
     @Test
@@ -77,8 +80,25 @@ public class DeviceRegistryFactoryTest {
         deviceRegistry.sendTelemetry(A_DEVICE_ID, SOME_TELEMETRY);
         verify(stubRegistry).sendTelemetry(eq(A_DEVICE_ID), eq(SOME_TELEMETRY));
 
+        deviceRegistry.getDeviceByManagedId(A_DEVICE_ID);
+        verify(stubRegistry).getDeviceByManagedId(eq(A_DEVICE_ID));
+
+        deviceRegistry.getManagedIds();
+        verify(stubRegistry).getManagedIds();
+
         deviceRegistry.getIds();
         verify(stubRegistry).getIds();
+    }
 
+    @Test
+    public void getDeviceRegistry_withNoPlugin_returnsNull() {
+
+        MockedStatic<ServiceLoaderUtils> serviceLoader = mockStatic(ServiceLoaderUtils.class);
+        serviceLoader.when(() -> ServiceLoaderUtils.findFirst(DeviceRegistryFactoryDescriptor.class))
+                .thenReturn(Optional.empty());
+        DeviceRegistryFactory.resetDeviceRegistryFactory();
+
+        Assert.assertNull(DeviceRegistryFactory.getDeviceRegistry());
+        serviceLoader.close();
     }
 }

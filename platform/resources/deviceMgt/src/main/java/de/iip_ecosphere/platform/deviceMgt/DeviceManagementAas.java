@@ -1,5 +1,6 @@
 package de.iip_ecosphere.platform.deviceMgt;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryFactory;
 import de.iip_ecosphere.platform.support.aas.*;
@@ -19,12 +20,12 @@ public class DeviceManagementAas implements AasContributor {
     public static final String NAME_COLL_DEVICE_MANAGER = "deviceManager";
     public static final String NAME_OP_UPDATE_RUNTIME = "updateRuntime";
     public static final String NAME_OP_ESTABLISH_SSH = "establishSsh";
+    public static final String NAME_OP_SET_CONFIG = "setConfig";
 
     public static final String ECS_UPDATE_URI = "https://an.uri.local";
 
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
-        System.out.println("Loading DeviceManagementAas");
         Submodel.SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
 
         SubmodelElementCollection.SubmodelElementCollectionBuilder deviceManager =
@@ -40,11 +41,18 @@ public class DeviceManagementAas implements AasContributor {
                 .addOutputVariable("result", Type.STRING)
                 .build();
 
+        deviceManager.createOperationBuilder(NAME_OP_SET_CONFIG)
+                .setInvocable(iCreator.createInvocable(getQName(NAME_OP_SET_CONFIG)))
+                .addInputVariable("deviceId", Type.STRING)
+                .addInputVariable("configPath", Type.STRING)
+                .build();
+
         deviceManager.build();
 
         smB.defer();
         return null;
     }
+
     @Override
     public void contributeTo(ProtocolServerBuilder sBuilder) {
         sBuilder.defineOperation(getQName(NAME_OP_UPDATE_RUNTIME),
@@ -55,18 +63,42 @@ public class DeviceManagementAas implements AasContributor {
         );
 
         sBuilder.defineOperation(getQName(NAME_OP_ESTABLISH_SSH),
-                new JsonResultWrapper(p -> {
-                    DeviceRemoteManagementOperations.SSHConnectionDetails connectionDetails =
-                            DeviceManagementFactory.getDeviceManagement().createSSHServer(readString(p));
+            p -> {
+                DeviceRemoteManagementOperations.SSHConnectionDetails connectionDetails;
+                try {
+                    connectionDetails = DeviceManagementFactory.getDeviceManagement().establishSsh(readString(p));
                     return new ObjectMapper().writeValueAsString(connectionDetails);
-                })
-        );
+                } catch (JsonProcessingException | ExecutionException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            });
+
+        sBuilder.defineOperation(getQName(NAME_OP_SET_CONFIG),
+            new JsonResultWrapper(p -> {
+                DeviceManagementFactory.getDeviceManagement().setConfig(readString(p), readString(p, 1));
+                return null;
+            }));
+    }
+
+    public static void notifySetConfig(String id, String downloadUri, String location) {
+        ActiveAasBase.processNotification(AasPartRegistry.NAME_SUBMODEL_RESOURCES, (sub, aas) -> {
+            try {
+                sub.getSubmodelElementCollection(id)
+                        .getOperation("setConfig")
+                        .invoke(downloadUri, location);
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     public static void notifyUpdateRuntime(String id) {
         ActiveAasBase.processNotification(AasPartRegistry.NAME_SUBMODEL_RESOURCES, (sub, aas) -> {
             try {
-                sub.getSubmodelElementCollection(id).getOperation("updateRuntime").invoke(ECS_UPDATE_URI);
+                sub.getSubmodelElementCollection(id)
+                        .getOperation("updateRuntime")
+                        .invoke(ECS_UPDATE_URI);
             } catch (ExecutionException e) {
                 e.printStackTrace();
             }

@@ -11,7 +11,6 @@ public class DeviceManagementFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DeviceManagementFactory.class.getName());
 
-
     private static DeviceManagement management;
     private static DeviceRemoteManagementOperations remoteManagementOperations;
     private static DeviceFirmwareOperations firmwareOperations;
@@ -25,7 +24,9 @@ public class DeviceManagementFactory {
                 if (first.isPresent()) {
                     firmwareOperations = first.get();
                 } else {
-                    LOGGER.error("No DeviceFirmwareOperations implementation available.");
+                    firmwareOperations = new AasDeviceFirmwareOperations();
+                    LOGGER.error("No DeviceFirmwareOperations implementation available, " +
+                            "fall back to default implementation: Direct AAS Method");
                 }
             }
 
@@ -35,7 +36,9 @@ public class DeviceManagementFactory {
                 if (first.isPresent()) {
                     resourceConfigOperations = first.get();
                 } else {
-                    LOGGER.error("No DeviceResourceConfigOperations implementation available.");
+                    resourceConfigOperations = new AasDeviceResourceConfigOperations();
+                    LOGGER.error("No DeviceResourceConfigOperations implementation available, " +
+                            "fall back to default implementation: Direct AAS Method");
                 }
             }
 
@@ -45,15 +48,26 @@ public class DeviceManagementFactory {
                 if (first.isPresent()) {
                     remoteManagementOperations = first.get();
                 } else {
+                    remoteManagementOperations = new SshRemoteManagementOperations();
                     LOGGER.error("No DeviceRemoteManagementOperations implementation available, " +
                             "fall back to default implementation: SSHProxy.");
-                    remoteManagementOperations = SshRemoteManagementOperations.getInstance();
                 }
             }
             management = new DeviceManagementImpl(firmwareOperations,
-                    remoteManagementOperations, resourceConfigOperations);
+                    remoteManagementOperations,
+                    resourceConfigOperations);
         }
 
         return management;
+    }
+
+    /**
+     * [testing]
+     */
+    protected static void resetDeviceManagement() {
+        management = null;
+        firmwareOperations = null;
+        remoteManagementOperations = null;
+        resourceConfigOperations = null;
     }
 }

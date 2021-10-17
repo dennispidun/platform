@@ -13,7 +13,6 @@
 package de.iip_ecosphere.platform.deviceMgt.registry;
 
 import de.iip_ecosphere.platform.support.aas.Submodel;
-import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.iip_aas.SubmodelElementsCollectionClient;
 
@@ -23,7 +22,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-public class DeviceRegistryAasClient extends SubmodelElementsCollectionClient implements DeviceRegistryClient {
+import static de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper.fromJson;
+
+public class DeviceRegistryAasClient extends SubmodelElementsCollectionClient
+        implements DeviceRegistryClient {
 
     public DeviceRegistryAasClient() throws IOException {
         super(DeviceRegistryAas.NAME_SUBMODEL, DeviceRegistryAas.NAME_COLL_DEVICE_REGISTRY);
@@ -50,7 +52,7 @@ public class DeviceRegistryAasClient extends SubmodelElementsCollectionClient im
 
     @Override
     public void addDevice(String id, String ip) throws ExecutionException {
-        getOperation(DeviceRegistryAas.NAME_OP_DEVICE_ADD).invoke(id, ip);
+        fromJson(getOperation(DeviceRegistryAas.NAME_OP_DEVICE_ADD).invoke(id, ip));
     }
 
     @Override
