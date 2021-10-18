@@ -12,14 +12,11 @@
 
 package de.iip_ecosphere.platform.deviceMgt;
 
-import de.iip_ecosphere.platform.deviceMgt.storage.S3RuntimeStorage;
 import de.iip_ecosphere.platform.deviceMgt.storage.Storage;
 import de.iip_ecosphere.platform.deviceMgt.storage.StorageFactory;
 import de.iip_ecosphere.platform.ecsRuntime.EcsAasClient;
 
 import java.io.IOException;
-import java.util.Comparator;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 /**
