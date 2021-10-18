@@ -18,7 +18,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * A S3RuntimeStorage grants access to the runtime storage through s3.
+ * A S3PackageStorage grants access to the package storages through s3.
  * For this purpose it uses MinioClient to communicate with the s3 storage.
  *
  * @author Dennis Pidun, University of Hildesheim
@@ -28,11 +28,11 @@ public class S3PackageStorage extends S3Storage {
     public final String packageFilename;
 
     /**
-     * Creates a new S3RuntimeStorage
+     * Creates a new S3PackageStorage
      *  @param minioClient the connected MinioClient
      * @param bucket the bucket
-     * @param packageDescriptor
-     * @param packageFilename
+     * @param packageDescriptor the packageDescriptor name (e.g. package.yml)
+     * @param packageFilename the packageFilename (eg package.zip)
      */
     public S3PackageStorage(MinioClient minioClient, String bucket,
                             String prefix, String packageDescriptor,

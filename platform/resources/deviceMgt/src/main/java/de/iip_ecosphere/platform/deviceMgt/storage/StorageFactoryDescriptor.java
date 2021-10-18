@@ -29,4 +29,11 @@ public interface StorageFactoryDescriptor {
      */
     Storage createRuntimeStorage(Configuration configuration);
 
+    /**
+     * Create a config storage.
+     *
+     * @param configuration the configuration
+     * @return the runtime storage
+     */
+    Storage createConfigStorage(Configuration configuration);
 }

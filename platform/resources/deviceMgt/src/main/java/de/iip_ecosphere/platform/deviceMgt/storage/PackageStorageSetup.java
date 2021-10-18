@@ -17,17 +17,20 @@ package de.iip_ecosphere.platform.deviceMgt.storage;
  *
  * @author Dennis Pidun, University of Hildesheim
  */
-public class StorageSetup {
+public class PackageStorageSetup {
 
     private String endpoint;
     private String accessKey;
     private String secretAccessKey;
     private String bucket;
+    private String prefix;
+    private String packageDescriptor;
+    private String packageFilename;
 
     /**
      * Default constructor, used by SnakeYaml.
      */
-    public StorageSetup() {
+    public PackageStorageSetup() {
     }
 
     /**
@@ -104,5 +107,59 @@ public class StorageSetup {
      */
     public void setSecretAccessKey(String secretAccessKey) {
         this.secretAccessKey = secretAccessKey;
+    }
+
+    /**
+     * Get the prefix
+     *
+     * @return the prefix
+     */
+    public String getPrefix() {
+        return prefix;
+    }
+
+    /**
+     * Set the prefix.
+     *
+     * @param prefix the prefix
+     */
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
+
+    /**
+     * Get the packageDescriptor
+     *
+     * @return the packageDescriptor
+     */
+    public String getPackageDescriptor() {
+        return packageDescriptor;
+    }
+
+    /**
+     * Set the packageDescriptor.
+     *
+     * @param packageDescriptor the packageDescriptor
+     */
+    public void setPackageDescriptor(String packageDescriptor) {
+        this.packageDescriptor = packageDescriptor;
+    }
+
+    /**
+     * Get the packageFilename
+     *
+     * @return the packageFilename
+     */
+    public String getPackageFilename() {
+        return packageFilename;
+    }
+
+    /**
+     * Set the packageFilename.
+     *
+     * @param packageFilename the packageFilename
+     */
+    public void setPackageFilename(String packageFilename) {
+        this.packageFilename = packageFilename;
     }
 }

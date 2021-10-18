@@ -1,6 +1,6 @@
 package de.iip_ecosphere.platform.deviceMgt;
 
-import de.iip_ecosphere.platform.deviceMgt.storage.StorageSetup;
+import de.iip_ecosphere.platform.deviceMgt.storage.PackageStorageSetup;
 import de.iip_ecosphere.platform.support.iip_aas.AasConfiguration;
 
 /**
@@ -10,23 +10,41 @@ import de.iip_ecosphere.platform.support.iip_aas.AasConfiguration;
  */
 public class Configuration extends AasConfiguration {
 
-    private StorageSetup storage;
+    private PackageStorageSetup configStorage;
+    private PackageStorageSetup runtimeStorage;
 
     /**
      * Get the StorageSetup
      *
      * @return the storageSetup
      */
-    public StorageSetup getStorage() {
-        return storage;
+    public PackageStorageSetup getRuntimeStorage() {
+        return runtimeStorage;
     }
 
     /**
-     * Set the StorageSetup
+     * Set the Runtime-StorageSetup
      *
-     * @param storage the StorageSetup
+     * @param runtimeStorage the StorageSetup of runtimes
      */
-    public void setStorage(StorageSetup storage) {
-        this.storage = storage;
+    public void setRuntimeStorage(PackageStorageSetup runtimeStorage) {
+        this.runtimeStorage = runtimeStorage;
+    }
+    /**
+     * Get the StorageSetup
+     *
+     * @return the storageSetup
+     */
+    public PackageStorageSetup getConfigStorage() {
+        return configStorage;
+    }
+
+    /**
+     * Set the Configs-StorageSetup
+     *
+     * @param configStorage the StorageSetup of configs
+     */
+    public void setConfigStorage(PackageStorageSetup configStorage) {
+        this.configStorage = configStorage;
     }
 }

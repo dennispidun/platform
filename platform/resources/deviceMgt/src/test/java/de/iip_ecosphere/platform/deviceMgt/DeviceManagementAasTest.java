@@ -191,7 +191,7 @@ public class DeviceManagementAasTest {
         when(stubStorage.list()).thenReturn(validRuntimesReducedListing());
         when(stubStorage.generateDownloadUrl(any())).thenReturn(A_DOWNLOADURL);
         when(stubStorage.getPrefix()).thenReturn("runtimes/");
-        StubStorageFactoryDescriptor.setStorage(stubStorage);
+        StubStorageFactoryDescriptor.setRuntimeStorage(stubStorage);
 
         new DeviceManagementAasClient().updateRuntime(A_DEVICE_ID);
 

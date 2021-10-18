@@ -25,22 +25,41 @@ import io.minio.MinioClient;
 public class S3StorageFactoryDescriptor implements StorageFactoryDescriptor {
 
     /**
-     * Creates a runtime storage with the help of the provided configuration.
+     * Creates and configures a runtime storage with the help of the provided configuration.
      *
      * @param configuration the configuration
      * @return a runtime storage
      */
     public Storage createRuntimeStorage(Configuration configuration) {
-        if (null == configuration || null == configuration.getStorage()) {
+        if (null == configuration) {
             return null;
         }
 
-        StorageSetup storageSetup = configuration.getStorage();
+        return createPackageStorage(configuration.getRuntimeStorage());
+    }
+
+    public Storage createConfigStorage(Configuration configuration) {
+        if (null == configuration) {
+            return null;
+        }
+
+        return createPackageStorage(configuration.getConfigStorage());
+    }
+
+    public Storage createPackageStorage(PackageStorageSetup storageSetup) {
+        if (null == storageSetup) {
+            return null;
+        }
+
         MinioClient minioClient = MinioClient.builder()
                 .endpoint(storageSetup.getEndpoint())
-                .credentials(storageSetup.getAccessKey(), storageSetup.getSecretAccessKey())
+                .credentials(storageSetup.getAccessKey(),
+                        storageSetup.getSecretAccessKey())
                 .build();
-        return new S3PackageStorage(minioClient, storageSetup.getBucket(),
-                "runtimes/", "runtime.yml", "runtime-image.zip");
+        return new S3PackageStorage(minioClient,
+                storageSetup.getBucket(),
+                storageSetup.getPrefix(),
+                storageSetup.getPackageDescriptor(),
+                storageSetup.getPackageFilename());
     }
 }

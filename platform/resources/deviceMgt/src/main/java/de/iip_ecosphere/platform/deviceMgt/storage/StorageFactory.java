@@ -30,7 +30,9 @@ public class StorageFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(StorageFactory.class.getName());
 
     private Storage runtimeStorage;
+    private Storage configStorage;
     private Configuration configuration;
+    private StorageFactoryDescriptor desc;
 
     /**
      * Creates a runtime storage with the help of the service provider.
@@ -41,19 +43,43 @@ public class StorageFactory {
      */
     public Storage createRuntimeStorage() {
         loadConfiguration();
+        initDesc();
 
-        if (runtimeStorage == null && configuration != null) {
+        if (runtimeStorage == null && configuration != null && desc != null) {
+            runtimeStorage = desc.createRuntimeStorage(configuration);
+        }
+        return runtimeStorage;
+    }
+
+    private void initDesc() {
+        if (desc == null) {
             Optional<StorageFactoryDescriptor> storageFactoryDescriptors =
                     ServiceLoaderUtils.findFirst(StorageFactoryDescriptor.class);
             if (storageFactoryDescriptors.isPresent()) {
-                runtimeStorage = storageFactoryDescriptors.get().createRuntimeStorage(configuration);
+                desc = storageFactoryDescriptors.get();
             } else {
-                runtimeStorage = new S3StorageFactoryDescriptor().createRuntimeStorage(configuration);
+                desc = new S3StorageFactoryDescriptor();
                 LOGGER.info("No StorageFactoryDescriptor implementation available, \" +\n" +
                         "fall back to default implementation: S3StorageFactoryDescriptor");
             }
         }
-        return runtimeStorage;
+    }
+
+    /**
+     * Creates a config storage with the help of the service provider.
+     * If no service provider is found, it will fall back to the
+     * S3StorageFactoryDescriptor as a default.
+     *
+     * @return the runtime storage
+     */
+    public Storage createConfigStorage() {
+        loadConfiguration();
+        initDesc();
+
+        if (configStorage == null && configuration != null && desc != null) {
+            configStorage = desc.createConfigStorage(configuration);
+        }
+        return configStorage;
     }
 
     private void loadConfiguration() {

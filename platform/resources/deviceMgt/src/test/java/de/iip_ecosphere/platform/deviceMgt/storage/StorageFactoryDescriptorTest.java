@@ -16,22 +16,30 @@ import static org.mockito.Mockito.when;
 
 public class StorageFactoryDescriptorTest {
 
-    public static final String A_PATH = "A_PATH";
-    public static final String AN_ENDPOINT = "endpoint";
-    public static final String AN_ACCESS_KEY = "AN_ACCESS_KEY";
-    public static final String AN_SECRET_ACCESS_KEY = "AN_SECRET_ACCESS_KEY";
-
     private Configuration configuration;
 
     @Before
     public void setUp() {
         configuration = new Configuration();
-        StorageSetup storageSetup = new StorageSetup();
-        storageSetup.setEndpoint("endpoint");
-        storageSetup.setBucket("bucket");
-        storageSetup.setAccessKey("access_key");
-        storageSetup.setSecretAccessKey("secret_access_key");
-        configuration.setStorage(storageSetup);
+        PackageStorageSetup packageStorageSetup = new PackageStorageSetup();
+        packageStorageSetup.setEndpoint("endpoint");
+        packageStorageSetup.setBucket("bucket");
+        packageStorageSetup.setAccessKey("access_key");
+        packageStorageSetup.setSecretAccessKey("secret_access_key");
+        packageStorageSetup.setPackageDescriptor("runtime.yml");
+        packageStorageSetup.setPackageFilename("runtime.zip");
+        packageStorageSetup.setPrefix("runtimes/");
+
+        configuration.setRuntimeStorage(packageStorageSetup);
+        PackageStorageSetup configsStorageSetup = new PackageStorageSetup();
+        configsStorageSetup.setEndpoint("endpoint");
+        configsStorageSetup.setBucket("bucket");
+        configsStorageSetup.setAccessKey("access_key");
+        configsStorageSetup.setSecretAccessKey("secret_access_key");
+        packageStorageSetup.setPackageDescriptor("config.yml");
+        packageStorageSetup.setPackageFilename("config.zip");
+        packageStorageSetup.setPrefix("configs/");
+        configuration.setConfigStorage(configsStorageSetup);
     }
 
     @Test
@@ -66,7 +74,7 @@ public class StorageFactoryDescriptorTest {
     }
 
     @Test
-    public void createRuntimeStorage_withoutServiceProvider_usesDefaultImplementation() {
+    public void createStorages_withoutServiceProvider_usesDefaultImplementation() {
         MockedStatic<ServiceLoaderUtils> serviceLoaderMock = Mockito.mockStatic(ServiceLoaderUtils.class);
         serviceLoaderMock.when(() -> ServiceLoaderUtils.findFirst(StorageFactoryDescriptor.class))
                 .thenReturn(Optional.empty());
@@ -74,8 +82,10 @@ public class StorageFactoryDescriptorTest {
         StorageFactory storageFactory = new StorageFactory();
         storageFactory.setConfiguration(configuration);
         Storage runtimeStorage = storageFactory.createRuntimeStorage();
+        Storage configStorage = storageFactory.createConfigStorage();
 
         Assert.assertTrue(runtimeStorage instanceof S3PackageStorage);
+        Assert.assertTrue(configStorage instanceof S3PackageStorage);
 
         serviceLoaderMock.close();
     }
