@@ -19,21 +19,31 @@
      <artifactId>support.iip-aas</artifactId>
      <version>${project.version}</version>
     </dependency>
-      <dependency>
-          <groupId>de.iip-ecosphere.platform</groupId>
-          <artifactId>transport</artifactId>
-          <version>${project.version}</version>
-      </dependency>
+    <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>transport</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
-      <!-- currently the EcsAasClient is required -->
-      <dependency>
-          <groupId>de.iip-ecosphere.platform</groupId>
-          <artifactId>ecsRuntime</artifactId>
-          <version>${project.version}</version>
-      </dependency>
-
-      <!-- NO dependency to de.iip-ecosphere.platform.services* or to de.iip-ecosphere.platform.ecsRuntime* !!
-          services.environment is ok for metrics -->
+    <!-- NO dependency to de.iip-ecosphere.platform.services* or to de.iip-ecosphere.platform.ecsRuntime* !!
+      services.environment is ok for metrics -->
+    <!-- currently the EcsAasClient is required -->
+    <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>ecsRuntime</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.minio</groupId>
+      <artifactId>minio</artifactId>
+      <version>8.3.1</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp -->
+    <dependency>
+      <groupId>com.squareup.okhttp3</groupId>
+      <artifactId>okhttp</artifactId>
+      <version>4.9.2</version>
+    </dependency>
 
     <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>

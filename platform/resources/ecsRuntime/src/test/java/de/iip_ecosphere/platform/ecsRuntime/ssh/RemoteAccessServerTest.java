@@ -29,7 +29,7 @@ public class RemoteAccessServerTest {
 
     @Test
     public void createCredentials_createsCredentials() {
-        remoteAccessServer.getCredentialsManager().addTunnelSettings(new Credentials(A_KEY, A_SECRET));
+        remoteAccessServer.getCredentialsManager().addCredentials(new Credentials(A_KEY, A_SECRET));
         Credentials tunnelSettings = remoteAccessServer.getCredentialsManager().getCredentials(A_KEY);
         Assert.assertNotNull(tunnelSettings);
         Assert.assertEquals(A_SECRET, tunnelSettings.getSecret());
@@ -50,7 +50,7 @@ public class RemoteAccessServerTest {
     public void name() {
         RemoteAccessServer remoteAccessServer = RemoteAccessServerFactory.create();
         remoteAccessServer.start();
-        remoteAccessServer.getCredentialsManager().addTunnelSettings(new Credentials("abc", "abc"));
+        remoteAccessServer.getCredentialsManager().addCredentials(new Credentials("abc", "abc"));
         while(true) {
 
         }

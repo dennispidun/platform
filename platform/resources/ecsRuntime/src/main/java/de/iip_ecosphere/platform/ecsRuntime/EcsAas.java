@@ -60,6 +60,8 @@ public class EcsAas implements AasContributor {
     public static final String NAME_PROP_VERSION = "version";
     public static final String NAME_PROP_STATE = "state";
     public static final String NAME_PROP_RESOURCE = "resource";
+    public static final String NAME_PROP_RUNTIME_NAME = "runtimeName";
+    public static final String NAME_PROP_RUNTIME_VERSION = "runtimeVersion";
     
     public static final String NAME_OP_GET_STATE = "getState";
     public static final String NAME_OP_CONTAINER_ADD = "addContainer";
@@ -92,8 +94,16 @@ public class EcsAas implements AasContributor {
             .setValue(Type.STRING, mgr.getContainerSystemName())
             .build();
         jB.createPropertyBuilder(NAME_PROP_CSYS_VERSION)
-            .setValue(Type.STRING, mgr.getContainerSystemVersion())
-            .build();
+                .setValue(Type.STRING, mgr.getContainerSystemVersion())
+                .build();
+
+        jB.createPropertyBuilder(NAME_PROP_RUNTIME_NAME)
+                .setValue(Type.STRING, "defaultEcsRuntime")
+                .build();
+
+        jB.createPropertyBuilder(NAME_PROP_RUNTIME_VERSION)
+                .setValue(Type.INTEGER, 1)
+                .build();
 
         createIdOp(jB, NAME_OP_CONTAINER_START, iCreator);
         createIdOp(jB, NAME_OP_CONTAINER_MIGRATE, iCreator, "location");

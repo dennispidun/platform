@@ -126,9 +126,10 @@ public interface DeviceRemoteManagementOperations {
         }
 
         /**
+         * Basic equals method, which checks every attribute
          *
-         * @param o
-         * @return
+         * @param o other object
+         * @return true if this and o are the same
          */
         @Override
         public boolean equals(Object o) {

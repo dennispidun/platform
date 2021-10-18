@@ -15,6 +15,10 @@ import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryAasClientTest;
 import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryAasTest;
 import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryFactoryTest;
 import de.iip_ecosphere.platform.deviceMgt.ssh.ProxyTest;
+import de.iip_ecosphere.platform.deviceMgt.storage.S3RuntimeStorage;
+import de.iip_ecosphere.platform.deviceMgt.storage.S3RuntimeStorageTest;
+import de.iip_ecosphere.platform.deviceMgt.storage.S3StorageTest;
+import de.iip_ecosphere.platform.deviceMgt.storage.StorageFactoryDescriptorTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -29,7 +33,10 @@ import org.junit.runners.Suite;
     DeviceRegistryAasTest.class,
     DeviceRegistryFactoryTest.class,
     DeviceRegistryAasClientTest.class,
-    ProxyTest.class
+    ProxyTest.class,
+    S3StorageTest.class,
+    S3RuntimeStorageTest.class,
+    StorageFactoryDescriptorTest.class
 })
 public class AllTests {
 }

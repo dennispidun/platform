@@ -135,13 +135,14 @@ public class DeviceManagementAas implements AasContributor {
      * Notify if a device needs an update and redirect the request.
      *
      * @param id the device id
+     * @param downloadUrl the download url
      */
-    public static void notifyUpdateRuntime(String id) {
+    public static void notifyUpdateRuntime(String id, String downloadUrl) {
         ActiveAasBase.processNotification(AasPartRegistry.NAME_SUBMODEL_RESOURCES, (sub, aas) -> {
             try {
                 sub.getSubmodelElementCollection(id)
                         .getOperation("updateRuntime")
-                        .invoke(ECS_UPDATE_URI);
+                        .invoke(downloadUrl);
             } catch (ExecutionException e) {
                 e.printStackTrace();
             }

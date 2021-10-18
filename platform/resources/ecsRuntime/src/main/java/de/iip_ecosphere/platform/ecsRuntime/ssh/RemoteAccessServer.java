@@ -1,3 +1,15 @@
+/**
+ * ******************************************************************************
+ * Copyright (c) {2021} The original author or authors
+ *
+ * All rights reserved. This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0 which is available
+ * at http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
+ ********************************************************************************/
+
 package de.iip_ecosphere.platform.ecsRuntime.ssh;
 
 import de.iip_ecosphere.platform.support.Server;
@@ -11,6 +23,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+
+/**
+ * A RemoteAccessServer grants access to the local terminal through a remote connection.
+ *
+ * @author Dennis Pidun, University of Hildesheim
+ */
 public class RemoteAccessServer implements Server {
 
     public static final String SSH_HOST = "0.0.0.0";
@@ -21,10 +39,18 @@ public class RemoteAccessServer implements Server {
 
     private CredentialsManager credentialsManager = new CredentialsManager();
 
-    protected RemoteAccessServer() {
+    /**
+     * Default constructor, restricts creation to package only.
+     */
+    RemoteAccessServer() {
 
     }
 
+    /**
+     * Start the ssh server
+     *
+     * @return the started server
+     */
     @Override
     public Server start() {
         if (server != null && server.isStarted()) {
@@ -50,11 +76,15 @@ public class RemoteAccessServer implements Server {
         return this;
     }
 
+    /**
+     * Stop the server
+     * @param immediately immediately
+     */
     @Override
-    public void stop(boolean b) {
+    public void stop(boolean immediately) {
         if (null != this.server) {
             try {
-                this.server.stop(b);
+                this.server.stop(immediately);
                 this.started = false;
             } catch (IOException e) {
                 e.printStackTrace();
@@ -62,81 +92,166 @@ public class RemoteAccessServer implements Server {
         }
     }
 
+    /**
+     * Gets the started status
+     *
+     * @return started
+     */
     public boolean isStarted() {
         return started;
     }
 
+    /**
+     * The credentials manager connected to the server
+     *
+     * @return the credentials manager
+     */
     public CredentialsManager getCredentialsManager() {
         return credentialsManager;
     }
 
+    /**
+     * A CredentialsManager stores credentials for the underlying ssh server.
+     *
+     * @author Dennis Pidun, University of Hildesheim
+     */
     public class CredentialsManager {
 
         private List<Credentials> credentials = new ArrayList<>();
 
+        /**
+         * Gets all currently saved credentials.
+         *
+         * @return the credentials list.
+         */
         public List<Credentials> getCredentials() {
             return credentials;
         }
 
-        public Credentials getCredentials(String edgeKey) {
+        /**
+         * Get specific credentials for a key.
+         *
+         * @param key the key
+         * @return the credentials
+         */
+        public Credentials getCredentials(String key) {
             return credentials.stream()
-                    .filter(ts -> ts.getKey().equals(edgeKey))
+                    .filter(ts -> ts.getKey().equals(key))
                     .findFirst()
                     .orElse(null);
         }
 
+        /**
+         * Checks if the given key and secret combination is stored in the credentials list.
+         *
+         * @param key the key
+         * @param secret the secret
+         * @return true if the credentials are right
+         */
         public boolean authenticate(String key, String secret) {
             Credentials edgeTunnelSettings = getCredentials(key);
             return edgeTunnelSettings != null && edgeTunnelSettings.getSecret().equals(secret);
         }
 
-        public void addTunnelSettings(Credentials tunnelSettings) {
-            this.credentials.add(tunnelSettings);
+        /**
+         * Adds credentails to the credentials manager.
+         *
+         * @param credentials the credentials
+         */
+        public void addCredentials(Credentials credentials) {
+            this.credentials.add(credentials);
         }
 
+        /**
+         * Add and generate some credentials.
+         * The key and secret is exactly 16 characters long
+         *
+         * @return the generated credentials
+         */
         public Credentials addGeneratedCredentials() {
-            Credentials tunnelSetting = new Credentials(
+            Credentials credentials = new Credentials(
                     UUID.randomUUID().toString().replaceAll("-", "").substring(0,16),
                     UUID.randomUUID().toString().replaceAll("-", "").substring(0,16));
-            credentials.add(tunnelSetting);
-            return tunnelSetting;
+            this.credentials.add(credentials);
+            return credentials;
         }
     }
 
+    /**
+     * Credentials data class.
+     *
+     * @author Dennis Pidun, University of Hildesheim
+     */
     public static class Credentials {
 
         private String key;
         private String secret;
 
+        /**
+         * Constructor for the credentials.
+         *
+         * @param key the key
+         * @param secret the secret
+         */
         public Credentials(String key, String secret) {
             this.key = key;
             this.secret = secret;
         }
 
+        /**
+         * Default constructor, is used for (de-)serialization.
+         */
         public Credentials() {
         }
 
+        /**
+         * Get the key.
+         *
+         * @return the key
+         */
         public String getKey() {
             return key;
         }
 
+        /**
+         * Sets the key.
+         * Method is used for deserialization.
+         *
+         * @param key the key
+         */
         public void setKey(String key) {
             this.key = key;
         }
 
+        /**
+         * Get the secret.
+         *
+         * @return the secret
+         */
         public String getSecret() {
             return secret;
         }
 
+        /**
+         * Sets the secret.
+         * Method is used for deserialization.
+         *
+         * @param secret the secret
+         */
         public void setSecret(String secret) {
             this.secret = secret;
         }
 
+        /**
+         * To string method.
+         *
+         * @return string containing key and secret
+         */
         @Override
         public String toString() {
-            return "TunnelSettings{" +
-                    "edgeKey='" + key + '\'' +
-                    ", edgeSecret='" + secret + '\'' +
+            return "Credentials{" +
+                    "key='" + key + '\'' +
+                    ", secret='" + secret + '\'' +
                     '}';
         }
     }

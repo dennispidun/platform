@@ -12,6 +12,14 @@
 
 package de.iip_ecosphere.platform.deviceMgt;
 
+import de.iip_ecosphere.platform.deviceMgt.storage.S3RuntimeStorage;
+import de.iip_ecosphere.platform.deviceMgt.storage.Storage;
+import de.iip_ecosphere.platform.deviceMgt.storage.StorageFactory;
+import de.iip_ecosphere.platform.ecsRuntime.EcsAasClient;
+
+import java.io.IOException;
+import java.util.Comparator;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -24,6 +32,33 @@ import java.util.concurrent.ExecutionException;
 public class AasDeviceFirmwareOperations implements DeviceFirmwareOperations {
     @Override
     public void updateRuntime(String id) throws ExecutionException {
-        DeviceManagementAas.notifyUpdateRuntime(id);
+        Storage runtimeStorage = new StorageFactory().createRuntimeStorage();
+        String downloadUrl = null;
+        try {
+            EcsAasClient ecsAasClient = new EcsAasClient(id);
+            String runtimeName = ecsAasClient.getRuntimeName();
+            Integer newRuntimeVersion = getHighestVersion(runtimeStorage, runtimeName);
+            if (newRuntimeVersion != -1) {
+                downloadUrl = runtimeStorage.generateDownloadUrl(runtimeName + "_" + newRuntimeVersion);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (downloadUrl != null) {
+            DeviceManagementAas.notifyUpdateRuntime(id, downloadUrl);
+        }
+    }
+    
+    private Integer getHighestVersion(Storage storage, String runtimeName) {
+        return storage.list().stream()
+                .filter(key -> key.startsWith(storage.getPrefix() + runtimeName + "_"))
+                .map(key -> {
+                    int lastUnderscore = key.lastIndexOf("_");
+                    String versionString = key.substring(lastUnderscore + 1);
+                    return Integer.parseInt(versionString);
+                })
+                .findFirst()
+                .orElse(-1);
     }
 }

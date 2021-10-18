@@ -50,6 +50,14 @@ public class StubEcsAas implements AasContributor {
                 .addInputVariable("location", Type.STRING)
                 .build();
 
+        device.createPropertyBuilder("runtimeName")
+                .setValue(Type.STRING, "stubRuntime")
+                .build();
+
+        device.createPropertyBuilder("runtimeVersion")
+                .setValue(Type.INTEGER, 1)
+                .build();
+
         device.build();
         smB.build();
 

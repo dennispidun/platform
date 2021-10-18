@@ -89,6 +89,16 @@ public class EcsAasClient extends SubmodelElementsCollectionClient implements Ec
     }
 
     @Override
+    public String getRuntimeName() throws ExecutionException {
+        return getPropertyStringValue(EcsAas.NAME_PROP_RUNTIME_NAME, "");
+    }
+
+    @Override
+    public Integer getRuntimeVersion() throws ExecutionException {
+        return Integer.parseInt(getPropertyStringValue(EcsAas.NAME_PROP_RUNTIME_VERSION, "-1"));
+    }
+
+    @Override
     public ContainerState getState(String id) {
         ContainerState result = ContainerState.UNKNOWN;
         try {

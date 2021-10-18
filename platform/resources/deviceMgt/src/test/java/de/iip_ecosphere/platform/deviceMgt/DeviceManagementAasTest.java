@@ -13,11 +13,15 @@
 package de.iip_ecosphere.platform.deviceMgt;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryAasClient;
 import de.iip_ecosphere.platform.deviceMgt.registry.StubDeviceRegistryFactoryDescriptor;
+import de.iip_ecosphere.platform.deviceMgt.storage.Storage;
+import de.iip_ecosphere.platform.deviceMgt.storage.StubStorageFactoryDescriptor;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
@@ -28,6 +32,7 @@ import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -49,6 +54,7 @@ public class DeviceManagementAasTest {
     public static final String A_CONFIG_PATH = "A_CONFIG_PATH";
     public static final String A_CONFIG_DOWNLOAD_URI = AasDeviceResourceConfigOperations.A_CONFIG_DOWNLOAD_URI;
     public static final String A_LOCATION = AasDeviceResourceConfigOperations.A_LOCATION;
+    public static final String A_DOWNLOADURL = "A_DOWNLOADURL";
 
     private static Aas aas;
     private static Server implServer;
@@ -181,10 +187,31 @@ public class DeviceManagementAasTest {
         // the default Implementation if ServiceLoader cant find any
         unloadFirmwareOperations();
 
+        Storage stubStorage = mock(Storage.class);
+        when(stubStorage.list()).thenReturn(validRuntimesReducedListing());
+        when(stubStorage.generateDownloadUrl(any())).thenReturn(A_DOWNLOADURL);
+        when(stubStorage.getPrefix()).thenReturn("runtimes/");
+        StubStorageFactoryDescriptor.setStorage(stubStorage);
+
         new DeviceManagementAasClient().updateRuntime(A_DEVICE_ID);
 
+        ArgumentCaptor<String> keyCaptor = ArgumentCaptor.forClass(String.class);
+        verify(stubStorage).generateDownloadUrl(keyCaptor.capture());
+
         verify(StubEcsAas.updateRuntimeMock, times(1))
-                .apply(eq(new String[]{DeviceManagementAas.ECS_UPDATE_URI}));
+                .apply(eq(new String[]{A_DOWNLOADURL}));
+
+        Assert.assertEquals("stubRuntime_3", keyCaptor.getValue());
+    }
+
+    private Set<String> validRuntimesReducedListing() {
+        Set<String> listing = new HashSet<>();
+        listing.add("runtimes/stubRuntime_1");
+        listing.add("runtimes/stubRuntime_2");
+        listing.add("runtimes/stubRuntime_3");
+        listing.add("runtimes/def");
+        listing.add("runtimes/ghi");
+        return listing;
     }
 
     /**
@@ -323,15 +350,16 @@ public class DeviceManagementAasTest {
                 "username",
                 "password"
         );
+        makeDeviceAvailable();
         when(deviceRemoteManagementOperations.establishSsh(eq(A_DEVICE_ID)))
                 .thenReturn(expectedConnectionDetails);
 
         DeviceRemoteManagementOperations.SSHConnectionDetails connectionDetails
                 = new DeviceManagementAasClient().establishSsh(A_DEVICE_ID);
 
+        Assert.assertEquals(expectedConnectionDetails, connectionDetails);
         verify(deviceRemoteManagementOperations, times(1))
                 .establishSsh(eq(A_DEVICE_ID));
-        Assert.assertEquals(expectedConnectionDetails, connectionDetails);
 
     }
 
@@ -449,11 +477,5 @@ public class DeviceManagementAasTest {
     private static void resetDeviceManagement() {
         DeviceManagementFactory.resetDeviceManagement();
         DeviceManagementFactory.getDeviceManagement();
-    }
-
-    private SubmodelElementCollection deviceManagement() throws IOException {
-        return AasPartRegistry.retrieveIipAas()
-                .getSubmodel(AasPartRegistry.NAME_SUBMODEL_RESOURCES)
-                .getSubmodelElementCollection(DeviceManagementAas.NAME_COLL_DEVICE_MANAGER);
     }
 }

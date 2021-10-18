@@ -10,7 +10,7 @@ import java.net.Socket;
 import java.net.SocketException;
 
 /**
- * A basic transparent proxy implementation, which should be run a thread.
+ * A basic transparent proxy implementation, which should be run in a thread.
  *
  * Main parts were acquired from https://github.com/oksuz/tcp-proxy (MIT)
  *
