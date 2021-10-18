@@ -17,46 +17,49 @@ import java.util.stream.Collectors;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-public class S3RuntimeStorageTest {
+public class S3PackageStorageTest {
 
 
     public static final String A_BUCKET = "abucket";
-    public static final String PREFIX = "runtimes/";
+    public static final String PREFIX = "prefix/";
     public static final String A_PATH = PREFIX + "A_PATH";
-    public static final String RUNTIME_IMAGE_PATH = A_PATH + "/" + "runtime-image.zip";
+    private static final String PACKAGE_NAME = "packageName.zip";
+    public static final String PACKAGE_PATH = A_PATH + "/" + PACKAGE_NAME;
+    private static final String PACKAGE_DESCRIPTOR = "packageDescriptor.yml";
 
     @Test
-    public void getPrefix_shouldBeSetToRuntimes() {
-        S3RuntimeStorage storage = new S3RuntimeStorage(null, null);
+    public void getPrefix_shouldBeSetToPrefix() {
+        S3PackageStorage storage = new S3PackageStorage(null, null, PREFIX, null, null);
         Assert.assertEquals(PREFIX, storage.getPrefix());
     }
 
     @Test
-    public void list_withMixedContent_onlyListsRuntimes() {
-        Set<String> listing = validRuntimesListing();
-        listing.add("runtimes/jkl/wrong-file.yml");
+    public void list_withMixedContent_onlyListsPackages() {
+        Set<String> listing = validPackageListing();
+        listing.add(PREFIX+"jkl/wrong-file.yml");
         MinioClient mc = mock(MinioClient.class);
         when(mc.listObjects(any())).thenReturn(setToResultIterable(listing));
-        S3RuntimeStorage storage = new S3RuntimeStorage(mc, A_BUCKET);
+        S3PackageStorage storage = new S3PackageStorage(mc, A_BUCKET,
+                PREFIX, PACKAGE_DESCRIPTOR, PACKAGE_NAME);
 
-        Assert.assertEquals(validRuntimesReducedListing(), storage.list());
+        Assert.assertEquals(validPackageReducedListing(), storage.list());
     }
 
     @Test
     public void getDownloadUrl_withValidUrl_returnsUrl() throws Exception {
         MinioClient mc = mock(MinioClient.class);
         ArgumentCaptor<GetPresignedObjectUrlArgs> requestCaptor = ArgumentCaptor.forClass(GetPresignedObjectUrlArgs.class);
-        when(mc.getPresignedObjectUrl(any())).thenReturn(RUNTIME_IMAGE_PATH);
+        when(mc.getPresignedObjectUrl(any())).thenReturn(PACKAGE_PATH);
 
-        S3RuntimeStorage storage = new S3RuntimeStorage(mc, A_BUCKET);
+        S3PackageStorage storage = new S3PackageStorage(mc, A_BUCKET, PREFIX, PACKAGE_DESCRIPTOR, PACKAGE_NAME);
         String downloadUrl = storage.generateDownloadUrl("A_PATH");
 
         verify(mc).getPresignedObjectUrl(requestCaptor.capture());
         GetPresignedObjectUrlArgs request = requestCaptor.getValue();
 
-        Assert.assertEquals(RUNTIME_IMAGE_PATH, request.object());
+        Assert.assertEquals(PACKAGE_PATH, request.object());
         Assert.assertEquals(Method.GET, request.method());
-        Assert.assertEquals(RUNTIME_IMAGE_PATH, downloadUrl);
+        Assert.assertEquals(PACKAGE_PATH, downloadUrl);
 
     }
 
@@ -64,22 +67,22 @@ public class S3RuntimeStorageTest {
         return objects.stream().map(o -> new Result<Item>(new Contents(o))).collect(Collectors.toSet());
     }
 
-    private Set<String> validRuntimesListing() {
+    private Set<String> validPackageListing() {
         Set<String> listing = new HashSet<>();
-        listing.add("runtimes/abc/runtime.yml");
-        listing.add("runtimes/abc/runtime-image.zip");
-        listing.add("runtimes/def/runtime.yml");
-        listing.add("runtimes/def/runtime-image.zip");
-        listing.add("runtimes/ghi/runtime.yml");
-        listing.add("runtimes/ghi/runtime-image.zip");
+        listing.add(PREFIX + "abc/"+PACKAGE_DESCRIPTOR);
+        listing.add(PREFIX + "abc/"+PACKAGE_NAME);
+        listing.add(PREFIX + "def/"+PACKAGE_DESCRIPTOR);
+        listing.add(PREFIX + "def/"+PACKAGE_NAME);
+        listing.add(PREFIX + "ghi/"+PACKAGE_DESCRIPTOR);
+        listing.add(PREFIX + "ghi/"+PACKAGE_NAME);
         return listing;
     }
 
-    private Set<String> validRuntimesReducedListing() {
+    private Set<String> validPackageReducedListing() {
         Set<String> listing = new HashSet<>();
-        listing.add("runtimes/abc");
-        listing.add("runtimes/def");
-        listing.add("runtimes/ghi");
+        listing.add(PREFIX + "abc");
+        listing.add(PREFIX + "def");
+        listing.add(PREFIX + "ghi");
         return listing;
     }
 }

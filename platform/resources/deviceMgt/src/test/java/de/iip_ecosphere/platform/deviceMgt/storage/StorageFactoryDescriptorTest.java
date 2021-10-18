@@ -1,9 +1,7 @@
 package de.iip_ecosphere.platform.deviceMgt.storage;
 
 import de.iip_ecosphere.platform.deviceMgt.Configuration;
-import de.iip_ecosphere.platform.deviceMgt.DeviceRemoteManagementOperations;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -77,7 +75,7 @@ public class StorageFactoryDescriptorTest {
         storageFactory.setConfiguration(configuration);
         Storage runtimeStorage = storageFactory.createRuntimeStorage();
 
-        Assert.assertTrue(runtimeStorage instanceof S3RuntimeStorage);
+        Assert.assertTrue(runtimeStorage instanceof S3PackageStorage);
 
         serviceLoaderMock.close();
     }

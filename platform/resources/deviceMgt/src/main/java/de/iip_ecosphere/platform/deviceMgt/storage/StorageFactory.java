@@ -61,7 +61,7 @@ public class StorageFactory {
             try {
                 configuration = Configuration.readFromYaml(Configuration.class);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.error("Cannot load Configuration: ", e);
             }
         }
     }

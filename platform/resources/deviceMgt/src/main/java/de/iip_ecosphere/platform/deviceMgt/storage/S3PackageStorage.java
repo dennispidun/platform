@@ -23,33 +23,36 @@ import java.util.stream.Collectors;
  *
  * @author Dennis Pidun, University of Hildesheim
  */
-public class S3RuntimeStorage extends S3Storage {
-
-    public static final String PREFIX = "runtimes/";
-    public static final String RUNTIME_YML_NAME = "runtime.yml";
-    public static final String RUNTIME_IMAGE_NAME = "runtime-image.zip";
+public class S3PackageStorage extends S3Storage {
+    public final String packageDescriptor;
+    public final String packageFilename;
 
     /**
      * Creates a new S3RuntimeStorage
-     *
-     * @param minioClient the connected MinioClient
+     *  @param minioClient the connected MinioClient
      * @param bucket the bucket
+     * @param packageDescriptor
+     * @param packageFilename
      */
-    public S3RuntimeStorage(MinioClient minioClient, String bucket) {
-        super(PREFIX, minioClient, bucket);
+    public S3PackageStorage(MinioClient minioClient, String bucket,
+                            String prefix, String packageDescriptor,
+                            String packageFilename) {
+        super(prefix, minioClient, bucket);
+        this.packageDescriptor = packageDescriptor;
+        this.packageFilename = packageFilename;
     }
 
     @Override
     public Set<String> list() {
         return super.list().stream()
-                .filter(key -> key.endsWith(RUNTIME_YML_NAME))
-                .map(key -> key.replace("/"+RUNTIME_YML_NAME, ""))
+                .filter(key -> key.endsWith(packageDescriptor))
+                .map(key -> key.replace("/"+ packageDescriptor, ""))
                 .collect(Collectors.toSet());
     }
 
     @Override
-    public String generateDownloadUrl(String runtime) {
-        String key = PREFIX + runtime + "/" + RUNTIME_IMAGE_NAME;
+    public String generateDownloadUrl(String packageName) {
+        String key = this.getPrefix() + packageName + "/" + packageFilename;
         return super.generateDownloadUrl(key);
     }
 }

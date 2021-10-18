@@ -40,6 +40,7 @@ public class S3StorageFactoryDescriptor implements StorageFactoryDescriptor {
                 .endpoint(storageSetup.getEndpoint())
                 .credentials(storageSetup.getAccessKey(), storageSetup.getSecretAccessKey())
                 .build();
-        return new S3RuntimeStorage(minioClient, storageSetup.getBucket());
+        return new S3PackageStorage(minioClient, storageSetup.getBucket(),
+                "runtimes/", "runtime.yml", "runtime-image.zip");
     }
 }
