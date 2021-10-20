@@ -9,13 +9,15 @@ However, it is important to recall, that this component shall not contain the fu
 
 ## Java
 
-On the Java side, this component provides the ``Service`` interface and a ``ServiceMapper`` linking the known service functions through ``ProtocolServerBuilder`` into an AAS implementation server. The Java environment also provides a ``MetricsProvider``, a facade to a micrometer monitoring registry, allowing for remote access to meters via REST. Moreover, (selected) information from the ``MetricsProvider`` is made available on AAS level (e.g., to be included into the service manager or ECS runtime), backed by a caching mechanism receiving regular monitoring information from predefined channels in the IIP-Ecosphere transport layer.
+On the Java side, this component provides the ``Service`` interface and a ``ServiceMapper`` linking the known service functions through ``ProtocolServerBuilder`` into an AAS implementation server. 
+
+TBD: Miguel: The current general monitoring properties provided by Spring/Micrometer.io including health monitoring.
 
 Further additional support classes allow reading basic information from the YAML service deployment descriptors (forward defintion for services component).
 
 ## Python
 
-On the Python side, this component provides a simple framework around the "abstract" ``Service`` class and similar ``ServiceMapper`` linking the known service functions through a Python port of the ``ProtocolServerBuilder`` into an AAS implementation server. It is important to recall, that the Python side just provides the implementation server, currently for VAB-TCP and VAB-HTTP. 
+On the Python side, this component provides a simple framework around the "abstract" ``Service`` class and similar ``ServiceMapper`` linking the known service functions through a Python port of the ``ProtocolServerBuilder`` into an AAS implementation server. It is important to recall, that the Python side just provides the implementation server. No more interaction with the AAS is needed. 
 
 Prerequisites/requirements:
 
@@ -24,5 +26,6 @@ Prerequisites/requirements:
 
 ## missing
 
-* Python data streaming integration
-* Extended monitoring involving also implementation processes such as Python.
+* Complete service interface, integration with services component.
+* Data streaming communication (generation support)
+* Python packaging for services startup (Maven, e.g., ZIP)
