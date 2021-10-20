@@ -186,7 +186,7 @@ public class MqttClient {
                 connOpts.setAutomaticReconnect(true);
                 if (null != config.getKeystore()) {
                     try {
-                        connOpts.setHttpsHostnameVerificationEnabled(config.getHostnameVerification());
+                        connOpts.setHttpsHostnameVerificationEnabled(false);
                         connOpts.setSocketFactory(SslUtils.createTlsContext(config.getKeystore(), 
                             config.getKeyPassword(), config.getKeyAlias()).getSocketFactory());
                     } catch (IOException e) {
