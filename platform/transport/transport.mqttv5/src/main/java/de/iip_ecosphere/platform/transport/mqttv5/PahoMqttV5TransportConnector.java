@@ -21,7 +21,6 @@ import org.eclipse.paho.mqttv5.client.persist.MemoryPersistence;
 import org.eclipse.paho.mqttv5.common.MqttException;
 import org.eclipse.paho.mqttv5.common.MqttMessage;
 import org.eclipse.paho.mqttv5.common.packet.MqttProperties;
-import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.SslUtils;
@@ -40,7 +39,6 @@ public class PahoMqttV5TransportConnector extends AbstractMqttTransportConnector
 
     public static final String NAME = "MQTT v5";
     private MqttAsyncClient client;
-    private boolean tlsEnabled = false;
 
     /**
      * Creates a connector instance.
@@ -105,15 +103,9 @@ public class PahoMqttV5TransportConnector extends AbstractMqttTransportConnector
             connOpts.setKeepAliveInterval(params.getKeepAlive());
             connOpts.setAutomaticReconnect(true);
             if (null != params.getKeystore()) {
-                try {
-                    connOpts.setHttpsHostnameVerificationEnabled(params.getHostnameVerification());
-                    connOpts.setSocketFactory(SslUtils.createTlsContext(params.getKeystore(), 
-                        params.getKeystorePassword(), params.getKeyAlias()).getSocketFactory());
-                    tlsEnabled = true;
-                } catch (IOException e) {
-                    LoggerFactory.getLogger(getClass()).error("MQTT: Loading keystore " + e.getMessage() 
-                        + ". Trying with no TLS.");
-                }
+                connOpts.setHttpsHostnameVerificationEnabled(false);
+                connOpts.setSocketFactory(SslUtils.createTlsContext(params.getKeystore(), 
+                    params.getKeystorePassword(), params.getKeyAlias()).getSocketFactory());
             }
             waitForCompletion(client.connect(connOpts));
         } catch (MqttException e) {
@@ -188,22 +180,5 @@ public class PahoMqttV5TransportConnector extends AbstractMqttTransportConnector
         return NAME;
     }
 
-    /**
-     * Returns the supported encryption mechanisms.
-     * 
-     * @return the supported encryption mechanisms, may be <b>null</b> or empty
-     */
-    public String supportedEncryption() {
-        return SslUtils.CONTEXT_ALG_TLS;
-    }
-
-    /**
-     * Returns the actually enabled encryption mechanisms on this instance.
-     * 
-     * @return the enabled encryption mechanisms, may be <b>null</b> or empty
-     */
-    public String enabledEncryption() {
-        return tlsEnabled ? SslUtils.CONTEXT_ALG_TLS : null;
-    }
 
 }
