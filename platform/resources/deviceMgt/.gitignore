@@ -3,3 +3,5 @@
 /.idea/
 *.iml
 docker/minio-data
+docker/mytb-data
+docker/mytb-logs
