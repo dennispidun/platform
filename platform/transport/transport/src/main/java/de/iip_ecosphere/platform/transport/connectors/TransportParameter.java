@@ -13,7 +13,6 @@ package de.iip_ecosphere.platform.transport.connectors;
 import java.io.File;
 
 import de.iip_ecosphere.platform.support.ServerAddress;
-import de.iip_ecosphere.platform.transport.connectors.basics.MqttQoS;
 
 /**
  * Captures common transport parameter for all connector types. Connectors shall document which of the
@@ -35,7 +34,6 @@ public class TransportParameter {
     private boolean hostnameVerification = false;
     private String user; // preliminary, AMQP
     private String password; // preliminary, AMQP
-    private MqttQoS qos = MqttQoS.AT_LEAST_ONCE;
 
     /**
      * A builder for transport parameter. Connectors shall indicate the required settings.
@@ -161,24 +159,13 @@ public class TransportParameter {
         }
         
         /**
-         * Defines whether TLS hostname verification shall be performed.
+         * Returns whether TLS hostname verification shall be performed.
          * 
          * @param hostnameVerification {@code false} for no verification, {@code true} else
          * @return <b>this</b>
          */
         public TransportParameterBuilder setHostnameVerification(boolean hostnameVerification) {
             instance.hostnameVerification = hostnameVerification;
-            return this;
-        }
-        
-        /**
-         * Defines the MQTT QoS level (may not apply to other protocols).
-         *   
-         * @param qos the QoS level (default is {@link MqttQoS#AT_LEAST_ONCE} 
-         * @return <b>this</b>
-         */
-        public TransportParameterBuilder setMqttQoS(MqttQoS qos) {
-            instance.qos = qos;
             return this;
         }
 
@@ -312,15 +299,6 @@ public class TransportParameter {
      */
     public boolean getHostnameVerification() {
         return hostnameVerification;
-    }
-
-    /**
-     * Returns the MQTT QoS level (may not apply to other protocols).
-     *   
-     * @return the QoS level 
-     */
-    public MqttQoS getMqttQoS() {
-        return qos;
     }
 
 }
