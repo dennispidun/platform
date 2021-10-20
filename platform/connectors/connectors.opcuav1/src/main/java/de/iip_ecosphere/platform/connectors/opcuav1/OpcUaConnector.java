@@ -56,20 +56,16 @@ import org.eclipse.milo.opcua.stack.core.types.builtin.QualifiedName;
 import org.eclipse.milo.opcua.stack.core.types.builtin.StatusCode;
 import org.eclipse.milo.opcua.stack.core.types.builtin.Variant;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UInteger;
-import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UNumber;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.MonitoringMode;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.TimestampsToReturn;
 import org.eclipse.milo.opcua.stack.core.types.structured.AnonymousIdentityToken;
 import org.eclipse.milo.opcua.stack.core.types.structured.CallMethodRequest;
-import org.eclipse.milo.opcua.stack.core.types.structured.ContentFilter;
 import org.eclipse.milo.opcua.stack.core.types.structured.EndpointDescription;
-import org.eclipse.milo.opcua.stack.core.types.structured.EventFilter;
 import org.eclipse.milo.opcua.stack.core.types.structured.IssuedIdentityToken;
 import org.eclipse.milo.opcua.stack.core.types.structured.MonitoredItemCreateRequest;
 import org.eclipse.milo.opcua.stack.core.types.structured.MonitoringParameters;
 import org.eclipse.milo.opcua.stack.core.types.structured.ReadValueId;
 import org.eclipse.milo.opcua.stack.core.types.structured.SignatureData;
-import org.eclipse.milo.opcua.stack.core.types.structured.SimpleAttributeOperand;
 import org.eclipse.milo.opcua.stack.core.types.structured.UserIdentityToken;
 import org.eclipse.milo.opcua.stack.core.types.structured.UserNameIdentityToken;
 import org.eclipse.milo.opcua.stack.core.types.structured.X509IdentityToken;
@@ -427,14 +423,13 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
             return callResult;
         }
 
-        /* Just for testing, see Identifiers.RootFolder */
-        /*private void browseNode(String indent, NodeId browseRoot) {
+        /* Just for testing
+        private void browseNode(String indent, NodeId browseRoot) {
             try {
                 List<? extends UaNode> nodes = client.getAddressSpace().browseNodes(browseRoot);
 
                 for (UaNode node : nodes) {
-                    LOGGER.info("{} Node={} Id={}", indent, node.getBrowseName().getName(), 
-                        node.getNodeId().getIdentifier());
+                    LOGGER.info("{} Node={}", indent, node.getBrowseName().getName());
 
                     // recursively browse to children
                     browseNode(indent + "  ", node.getNodeId());
@@ -535,11 +530,6 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                 Variant r = value.getValue();
                 if (null != r) {
                     result = r.getValue();
-                    if (result instanceof UNumber) { // simplfied
-                        result = ((UNumber) result).intValue();
-                    } else if (result instanceof NodeId) {
-                        result = result.toString();
-                    }
                 } else {
                     result = null;
                 }
@@ -648,17 +638,12 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                     + " found in " + cls.getName());
             }
         }
-        
-        @Override
-        protected ConnectorParameter getConnectorParameter() {
-            return params;
-        }
 
         @Override
-        public void monitor(int notificationInterval, String... qName) throws IOException {
+        public void monitor(String... qName) throws IOException {
             try {
                 UaSubscription subscription = client.getSubscriptionManager().createSubscription(
-                    notificationInterval).get();
+                    params.getNotificationInterval()).get();
                 UInteger clientHandle = subscription.nextClientHandle();
             
                 MonitoringParameters parameters = new MonitoringParameters(
@@ -672,8 +657,9 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                 List<MonitoredItemCreateRequest> requests = new ArrayList<MonitoredItemCreateRequest>();
                 for (String n: qName) {
                     UaNode node = retrieveNode(n);
-                    ReadValueId readValueId = new ReadValueId(node.getNodeId(), AttributeId.Value.uid(), 
-                        null, QualifiedName.NULL_VALUE);
+                    ReadValueId readValueId = new ReadValueId(
+                        node.getNodeId(), AttributeId.Value.uid(), null, QualifiedName.NULL_VALUE
+                    );
                     MonitoredItemCreateRequest request = new MonitoredItemCreateRequest(
                         readValueId,
                         MonitoringMode.Reporting,
@@ -681,9 +667,9 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                     );
                     requests.add(request);
                 }
-
+                
                 BiConsumer<UaMonitoredItem, Integer> onItemCreated =
-                    (item, id) -> item.setValueConsumer(this::onSubscriptionValue); 
+                    (item, id) -> item.setValueConsumer(this::onSubscriptionValue);
 
                 List<UaMonitoredItem> items = subscription.createMonitoredItems(
                     TimestampsToReturn.Both,
@@ -695,69 +681,11 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                     if (item.getStatusCode().isGood()) {
                         LOGGER.info("Monitoring for nodeId={} activated", item.getReadValueId().getNodeId());
                     } else {
-                        LOGGER.warn("Monitoring: Failed to create item for nodeId={} (status={})",
+                        LOGGER.warn("failed to create item for nodeId={} (status={})",
                             item.getReadValueId().getNodeId(), item.getStatusCode());
                     }
                 }
             } catch (UaException | ExecutionException | InterruptedException e) {
-                throw new IOException(e);
-            }
-        }
-
-        @Override
-        public void monitorModelChanges(int notificationInterval) throws IOException {
-            try {
-                UaSubscription subscription = client.getSubscriptionManager().createSubscription(
-                    notificationInterval).get();
-                UInteger clientHandle = subscription.nextClientHandle();
-            
-                EventFilter eventFilter = new EventFilter(
-                    new SimpleAttributeOperand[]{
-                        new SimpleAttributeOperand(
-                            Identifiers.BaseModelChangeEventType,
-                            new QualifiedName[]{new QualifiedName(0, "Severity")},
-                            AttributeId.Value.uid(),
-                            null),
-                    },
-                    new ContentFilter(null)
-                );                
-                
-                MonitoringParameters parameters = new MonitoringParameters(
-                    clientHandle,
-                    (double) params.getNotificationInterval(), // sampling interval
-                    ExtensionObject.encode(client.getSerializationContext(), eventFilter),
-                    uint(10),   // queue size
-                    true        // discard oldest
-                );
-
-                List<MonitoredItemCreateRequest> requests = new ArrayList<MonitoredItemCreateRequest>();
-                ReadValueId readValueId = new ReadValueId(Identifiers.Server, AttributeId.EventNotifier.uid(), 
-                        null, QualifiedName.NULL_VALUE);
-                MonitoredItemCreateRequest request = new MonitoredItemCreateRequest(
-                    readValueId,
-                    MonitoringMode.Reporting,
-                    parameters
-                );
-                requests.add(request);
-                
-                BiConsumer<UaMonitoredItem, Integer> onItemCreated =
-                    (item, id) -> item.setEventConsumer(this::onEvent);
-
-                List<UaMonitoredItem> items = subscription.createMonitoredItems(
-                    TimestampsToReturn.Both,
-                    requests,
-                    onItemCreated
-                ).get();              
-                
-                for (UaMonitoredItem item : items) {
-                    if (item.getStatusCode().isGood()) {
-                        LOGGER.info("Monitoring for nodeId={} activated", item.getReadValueId().getNodeId());
-                    } else {
-                        LOGGER.warn("Monitoring: Failed to create item for nodeId={} (status={})",
-                            item.getReadValueId().getNodeId(), item.getStatusCode());
-                    }
-                }
-            } catch (ExecutionException | InterruptedException e) {
                 throw new IOException(e);
             }
         }
@@ -778,21 +706,6 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                     details = null;
                 }
                 received(details);
-            } catch (IOException e) {
-                LOGGER.info("While triggering reception", e);
-            }
-        }
-        
-        /**
-         * Is called when a monitoring event occurs.
-         * 
-         * @param item the monitored item
-         * @param var the changed values/variants
-         */
-        private void onEvent(UaMonitoredItem item, Variant[] var) {
-            try {
-                // unclear about event details, no hint to changed node while it is there in UAExplorer
-                received(null);
             } catch (IOException e) {
                 LOGGER.info("While triggering reception", e);
             }
