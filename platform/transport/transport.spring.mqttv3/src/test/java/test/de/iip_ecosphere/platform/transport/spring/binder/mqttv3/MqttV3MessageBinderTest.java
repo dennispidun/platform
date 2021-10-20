@@ -149,7 +149,6 @@ public class MqttV3MessageBinderTest {
                 .setApplicationId("infra");
             if (null != secCfg) {
                 tpBuilder.setKeystore(getKeystore(), getKeystorePassword()); 
-                tpBuilder.setActionTimeout(3000);
             }
             infra.connect(tpBuilder.build());            
             infra.setReceptionCallback("mqttv3Binder", new ReceptionCallback<String>() {
@@ -230,9 +229,7 @@ public class MqttV3MessageBinderTest {
          */
         @Bean
         public Function<String, String> transform() {
-            return in -> {
-                return in + " world";
-            };
+            return in -> in + " world";
         }
         
         /**
@@ -242,9 +239,7 @@ public class MqttV3MessageBinderTest {
          */
         @Bean
         public Consumer<String> receiveInput() {
-            return s -> {
-                received = s;
-            };
+            return s -> received = s;
         }
         
         /**
