@@ -28,7 +28,6 @@ public class BasicConfiguration {
     private int port; // in test, consider overriding initializer for ephemeral port
     private File keystore;
     private String keyPassword;
-    private String keyAlias;
 
     /**
      * Returns the broker host name.
@@ -65,15 +64,6 @@ public class BasicConfiguration {
      */
     public String getKeystorePassword() {
         return keyPassword;
-    }
-
-    /**
-     * Returns the alias denoting the key to use.
-     * 
-     * @return the alias, may be <b>null</b> for none/first match
-     */
-    public String getKeyAlias() {
-        return keyAlias;
     }
 
     // setters required for @ConfigurationProperties
@@ -114,16 +104,7 @@ public class BasicConfiguration {
     public void setKeystorePassword(String keyPassword) {
         this.keyPassword = keyPassword;
     }
-
-    /**
-     * Returns the alias denoting the key to use.
-     * 
-     * @param alias the alias, may be <b>null</b> for none/first match
-     */
-    public void setKeyAlias(String alias) {
-        this.keyAlias = alias;
-    }
-
+    
     // converter
 
     /**
@@ -135,9 +116,6 @@ public class BasicConfiguration {
         TransportParameterBuilder builder = TransportParameterBuilder.newBuilder(getHost(), getPort());
         if (null != getKeystore()) {
             builder.setKeystore(getKeystore(), getKeystorePassword());
-            if (null != getKeyAlias()) {
-                builder.setKeyAlias(getKeyAlias());
-            }
         }
         return builder.build();
     }

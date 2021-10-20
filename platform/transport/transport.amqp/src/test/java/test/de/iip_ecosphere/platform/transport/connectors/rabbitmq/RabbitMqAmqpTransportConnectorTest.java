@@ -62,7 +62,6 @@ public class RabbitMqAmqpTransportConnectorTest {
      */
     @Test
     public void testRabbitMqConnector() throws IOException {
-        TestQpidServer.setConfigDir(null);
         doTest(null);        
     }
     
