@@ -19,3 +19,5 @@ The following configuration options are supported:
 
 **Missing**
 - Validation/fixing topic names w.r.t. MQTT specification
+- Authentication/Security
+
