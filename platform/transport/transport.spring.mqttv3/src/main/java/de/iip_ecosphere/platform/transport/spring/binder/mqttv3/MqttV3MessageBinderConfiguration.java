@@ -42,17 +42,6 @@ public class MqttV3MessageBinderConfiguration {
     public MqttV3MessageBinderProvisioner mqttv3BinderProvisioner() {
         return new MqttV3MessageBinderProvisioner(client);
     }
-    
-    /**
-     * Returns the client instance.
-     * 
-     * @return the client instance
-     */
-    @Bean
-    @ConditionalOnMissingBean
-    public MqttClient mqttClient() {
-        return client;
-    }
 
     /**
      * Returns the message binder.

@@ -11,7 +11,6 @@
 
 package test.de.iip_ecosphere.platform.transport.spring.binder.mqttv3;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -61,10 +60,9 @@ import test.de.iip_ecosphere.platform.transport.spring.StringSerializer;
 @RunWith(SpringRunner.class)
 public class MqttV3MessageBinderTest {
 
-    private static ServerAddress addr = new ServerAddress(Schema.IGNORE); // localhost, ephemeral
+    private static final ServerAddress ADDR = new ServerAddress(Schema.IGNORE); // localhost, ephemeral
     private static TestMoquetteServer server;
     private static String received;
-    private static File secCfg;
 
     @Autowired
     private TransportParameter params;
@@ -79,55 +77,10 @@ public class MqttV3MessageBinderTest {
         @Override
         public void initialize(ConfigurableApplicationContext applicationContext) {
             TestPropertyValues
-                .of("mqtt.port=" + addr.getPort())
+                .of("mqtt.port=" + ADDR.getPort())
                 .applyTo(applicationContext);
-            if (null == MqttClient.getLastInstance() && null != getKeystore()) {
-                TestPropertyValues
-                    .of("mqtt.keystore=" + getKeystore(), "mqtt.keyPassword=" + getKeystorePassword(), 
-                        "mqtt.schema=ssl", "mqtt.actionTimeout=3000")
-                    .applyTo(applicationContext);
-            }            
         }
         
-    }
-    
-    /**
-     * Defines the secure config folder.
-     * 
-     * @param folder the folder, used instead of the default config folder if not <b>null</b>
-     */
-    protected static void setSecCfg(File folder) {
-        secCfg = folder;
-    }
-
-    /**
-     * Returns the keystore if {@link #secCfg} is set.
-     * 
-     * @return the keystore, <b>null</b> if {@link #secCfg} is <b>null</b>
-     */
-    protected static File getKeystore() {
-        return null == secCfg ? null : new File(secCfg, "keystore.jks");
-    }
-    
-    /**
-     * Returns the keystore password if {@link #secCfg} is set.
-     * 
-     * @return the keystore password, <b>null</b> if {@link #secCfg} is <b>null</b>
-     */
-    protected static String getKeystorePassword() {
-        return null == secCfg ? null : TestMoquetteServer.KEYSTORE_PASSWORD;
-    }
-    
-    /**
-     * Rests the broker address.
-     * 
-     * @param schema the address schema
-     * @return the new broker address
-     */
-    protected static ServerAddress resetAddr(Schema schema) {
-        received = null;
-        addr = new ServerAddress(schema); // localhost, ephemeral port
-        return addr;
     }
     
     /**
@@ -137,20 +90,14 @@ public class MqttV3MessageBinderTest {
      */
     @BeforeClass
     public static void init() {
-        TestMoquetteServer.setConfigDir(secCfg);
-        server = new TestMoquetteServer(addr);
+        server = new TestMoquetteServer(ADDR);
         server.start();
         TimeUtils.sleep(1000);
         SerializerRegistry.registerSerializer(StringSerializer.class);
         final PahoMqttV3TransportConnector infra = new PahoMqttV3TransportConnector();
         try {
-            TransportParameterBuilder tpBuilder = TransportParameterBuilder
-                .newBuilder(addr.getHost(), addr.getPort())
-                .setApplicationId("infra");
-            if (null != secCfg) {
-                tpBuilder.setKeystore(getKeystore(), getKeystorePassword()); 
-            }
-            infra.connect(tpBuilder.build());            
+            infra.connect(TransportParameterBuilder.newBuilder(ADDR.getHost(), ADDR.getPort())
+                .setApplicationId("infra").build());
             infra.setReceptionCallback("mqttv3Binder", new ReceptionCallback<String>() {
     
                 @Override
@@ -170,7 +117,7 @@ public class MqttV3MessageBinderTest {
         } catch (IOException e) {
             System.out.println("CONNECTOR PROBLEM " + e.getMessage());
         }
-        System.out.println("Started infra client on " + addr.getHost() + " " + addr.getPort());
+        System.out.println("Started infra client on " + ADDR.getHost() + " " + ADDR.getPort());
         TimeUtils.sleep(1000);
     }
     
@@ -185,7 +132,6 @@ public class MqttV3MessageBinderTest {
         server.stop(true);
         SerializerRegistry.unregisterSerializer(StringSerializer.class);
         SerializerRegistry.resetDefaults();
-        TestMoquetteServer.setConfigDir(null);
     }
     
     /**
@@ -200,7 +146,7 @@ public class MqttV3MessageBinderTest {
 
         Assert.assertNotNull("The autowired transport parameters shall not be null", params);
         Assert.assertEquals("localhost", params.getHost());
-        //Assert.assertEquals(addr.getPort(), params.getPort()); does not work with TLS test reuse/reconf params
+        Assert.assertEquals(ADDR.getPort(), params.getPort());
         Assert.assertEquals("test", params.getApplicationId());
     }
     
