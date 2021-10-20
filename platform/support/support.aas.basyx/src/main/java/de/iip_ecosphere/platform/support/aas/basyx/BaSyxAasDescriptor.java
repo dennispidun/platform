@@ -13,7 +13,7 @@
 package de.iip_ecosphere.platform.support.aas.basyx;
 
 import org.eclipse.basyx.aas.metamodel.map.descriptor.AASDescriptor;
-import org.eclipse.basyx.aas.restapi.MultiSubmodelProvider;
+import org.eclipse.basyx.aas.restapi.VABMultiSubmodelProvider;
 
 /**
  * An internal AAS deployment descriptor.
@@ -23,7 +23,7 @@ import org.eclipse.basyx.aas.restapi.MultiSubmodelProvider;
 class BaSyxAasDescriptor {
     
     private AASDescriptor aasDescriptor;
-    private MultiSubmodelProvider fullProvider;
+    private VABMultiSubmodelProvider fullProvider;
     
     /**
      * Creates an instance.
@@ -31,7 +31,7 @@ class BaSyxAasDescriptor {
      * @param fullProvider the sub-model provider
      * @param aasDescriptor the AAS descriptor
      */
-    BaSyxAasDescriptor(MultiSubmodelProvider fullProvider, AASDescriptor aasDescriptor) {
+    BaSyxAasDescriptor(VABMultiSubmodelProvider fullProvider, AASDescriptor aasDescriptor) {
         this.fullProvider = fullProvider;
         this.aasDescriptor = aasDescriptor;
     }
@@ -50,7 +50,7 @@ class BaSyxAasDescriptor {
      * 
      * @return the sub-model provider
      */
-    MultiSubmodelProvider getFullProvider() {
+    VABMultiSubmodelProvider getFullProvider() {
         return fullProvider;
     }
 }

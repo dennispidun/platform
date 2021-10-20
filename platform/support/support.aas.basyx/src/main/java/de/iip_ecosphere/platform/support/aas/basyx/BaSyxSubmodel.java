@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.support.aas.basyx;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
+import org.eclipse.basyx.submodel.metamodel.map.SubModel;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.aas.Submodel;
@@ -29,7 +30,7 @@ import de.iip_ecosphere.platform.support.aas.basyx.AbstractAas.BaSyxSubmodelPare
  * 
  * @author Holger Eichelberger, SSE
  */
-public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.basyx.submodel.metamodel.map.Submodel> {
+public class BaSyxSubmodel extends AbstractSubmodel<SubModel> {
 
     private BaSyxSubmodelParent parent;
     
@@ -38,12 +39,12 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.basyx.submodel.m
      * 
      * @author Holger Eichelberger, SSE
      */
-    static class BaSyxSubmodelBuilder extends BaSyxSubmodelElementContainerBuilder
-        <org.eclipse.basyx.submodel.metamodel.map.Submodel> implements SubmodelBuilder {
+    static class BaSyxSubmodelBuilder extends BaSyxSubmodelElementContainerBuilder<SubModel> 
+        implements SubmodelBuilder {
 
         private BaSyxAbstractAasBuilder parentBuilder;
         private BaSyxSubmodel instance;
-        private org.eclipse.basyx.submodel.metamodel.map.Submodel submodel;
+        private SubModel submodel;
         private boolean isNew = true;
 
         /**
@@ -69,7 +70,7 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.basyx.submodel.m
          */
         BaSyxSubmodelBuilder(BaSyxAbstractAasBuilder parentBuilder, String idShort, IIdentifier identifier) {
             this.parentBuilder = parentBuilder;
-            submodel = new org.eclipse.basyx.submodel.metamodel.map.Submodel(Tools.checkId(idShort), identifier);
+            submodel = new SubModel(Tools.checkId(idShort), identifier);
             instance = new BaSyxSubmodel(submodel);
             instance.parent = null == parentBuilder ? null : parentBuilder.getSubmodelParent();
         }
@@ -124,7 +125,7 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.basyx.submodel.m
         }
 
         @Override
-        protected AbstractSubmodel<org.eclipse.basyx.submodel.metamodel.map.Submodel> getInstance() {
+        protected AbstractSubmodel<SubModel> getInstance() {
             return instance;
         }
 
@@ -140,7 +141,7 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.basyx.submodel.m
      * 
      * @param subModel the sub-model instance
      */
-    private BaSyxSubmodel(org.eclipse.basyx.submodel.metamodel.map.Submodel subModel) {
+    private BaSyxSubmodel(SubModel subModel) {
         super(subModel);
     }
     
@@ -150,7 +151,7 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.basyx.submodel.m
      * @param parent the parent instance
      * @param instance the BaSyx submodel instance
      */
-    BaSyxSubmodel(BaSyxSubmodelParent parent, org.eclipse.basyx.submodel.metamodel.map.Submodel instance) {
+    BaSyxSubmodel(BaSyxSubmodelParent parent, SubModel instance) {
         super(instance);
         this.parent = parent;
         BaSyxElementTranslator.registerSubmodelElements(instance.getSubmodelElements(), this);

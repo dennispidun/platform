@@ -12,7 +12,7 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx;
 
-import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
+import org.eclipse.basyx.submodel.metamodel.api.ISubModel;
 
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel;
@@ -26,7 +26,7 @@ import de.iip_ecosphere.platform.support.aas.basyx.BaSyxConnectedAas.BaSyxConnec
  * 
  * @author Holger Eichelberger, SSE
  */
-public class BaSyxISubmodel extends AbstractSubmodel<ISubmodel> {
+public class BaSyxISubmodel extends AbstractSubmodel<ISubModel> {
 
     private BaSyxConnectedAas parent;
 
@@ -35,7 +35,7 @@ public class BaSyxISubmodel extends AbstractSubmodel<ISubmodel> {
      * 
      * @author Holger Eichelberger, SSE
      */
-    static class BaSyxISubmodelBuilder extends BaSyxSubmodelElementContainerBuilder<ISubmodel> 
+    static class BaSyxISubmodelBuilder extends BaSyxSubmodelElementContainerBuilder<ISubModel> 
         implements SubmodelBuilder {
         
         private BaSyxConnectedAasBuilder parentBuilder;
@@ -98,7 +98,7 @@ public class BaSyxISubmodel extends AbstractSubmodel<ISubmodel> {
         }
 
         @Override
-        protected AbstractSubmodel<ISubmodel> getInstance() {
+        protected AbstractSubmodel<ISubModel> getInstance() {
             return instance;
         }
 
@@ -115,7 +115,7 @@ public class BaSyxISubmodel extends AbstractSubmodel<ISubmodel> {
      * @param parent the parent AAS
      * @param submodel the instance
      */
-    public BaSyxISubmodel(BaSyxConnectedAas parent, ISubmodel submodel) {
+    public BaSyxISubmodel(BaSyxConnectedAas parent, ISubModel submodel) {
         super(submodel);
         this.parent = parent;
         BaSyxElementTranslator.registerSubmodelElements(submodel.getSubmodelElements(), this);
@@ -126,7 +126,7 @@ public class BaSyxISubmodel extends AbstractSubmodel<ISubmodel> {
         boolean allowDuplicates) {
         SubmodelElementCollectionBuilder result = getDeferred(idShort, SubmodelElementCollectionBuilder.class);
         if (null == result) {
-            BaSyxSubmodelElementContainerBuilder<ISubmodel> secb = new BaSyxISubmodelBuilder(
+            BaSyxSubmodelElementContainerBuilder<ISubModel> secb = new BaSyxISubmodelBuilder(
                 new BaSyxConnectedAasBuilder(parent), this);
     
             SubmodelElementCollection sub = getSubmodelElementCollection(idShort);

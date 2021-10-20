@@ -24,6 +24,7 @@ import org.eclipse.basyx.aas.factory.json.JSONToMetamodelConverter;
 import org.eclipse.basyx.aas.factory.json.MetamodelToJSONConverter;
 import org.eclipse.basyx.aas.metamodel.map.AssetAdministrationShell;
 import org.eclipse.basyx.aas.metamodel.map.parts.Asset;
+import org.eclipse.basyx.submodel.metamodel.map.SubModel;
 import org.eclipse.basyx.submodel.metamodel.map.parts.ConceptDescription;
 
 import de.iip_ecosphere.platform.support.ExtensionBasedFileFormat;
@@ -51,8 +52,7 @@ public class JsonPersistenceRecipe extends AbstractPersistenceRecipe {
     @Override
     public void writeTo(List<Aas> aas, File file) throws IOException {
         List<AssetAdministrationShell> basyxAas = new ArrayList<AssetAdministrationShell>();
-        List<org.eclipse.basyx.submodel.metamodel.map.Submodel> basyxSubmodels 
-            = new ArrayList<org.eclipse.basyx.submodel.metamodel.map.Submodel>();
+        List<SubModel> basyxSubmodels = new ArrayList<SubModel>();
         Collection<Asset> assetList = new ArrayList<Asset>();
         Collection<ConceptDescription> conceptDescriptionList = new ArrayList<ConceptDescription>();
         for (Aas a : aas) {
