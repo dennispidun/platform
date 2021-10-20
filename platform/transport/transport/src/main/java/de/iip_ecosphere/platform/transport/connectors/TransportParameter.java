@@ -30,7 +30,6 @@ public class TransportParameter {
     private int keepAlive = 2000; 
     private File keystore;
     private String keyPassword;
-    private String keyAlias;
     private String user; // preliminary, AMQP
     private String password; // preliminary, AMQP
 
@@ -147,17 +146,6 @@ public class TransportParameter {
         }
 
         /**
-         * Sets up optional TLS key alias.
-         * 
-         * @param alias key alias, may be <b>null</b> for none/first match
-         * @return <b>this</b>
-         */
-        public TransportParameterBuilder setKeyAlias(String alias) {
-            instance.keyAlias = alias;
-            return this;
-        }
-
-        /**
          * Returns the created instance.
          * 
          * @return the created instance
@@ -269,15 +257,6 @@ public class TransportParameter {
      */
     public String getKeystorePassword() {
         return keyPassword;
-    }
-    
-    /**
-     * Returns the alias of the key in {@link #getKeystore()} to use.
-     * 
-     * @return the alias or <b>null</b> for none/first match
-     */
-    public String getKeyAlias() {
-        return keyAlias;
     }
 
 }

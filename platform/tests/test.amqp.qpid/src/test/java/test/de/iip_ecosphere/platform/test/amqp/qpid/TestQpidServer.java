@@ -31,7 +31,6 @@ import test.de.iip_ecosphere.platform.transport.AbstractTestServer;
 public class TestQpidServer extends AbstractTestServer {
     
     public static final String KEYSTORE_PASSWORD = "a1234567";
-    public static final String KEY_ALIAS = "qpid";
     private SystemLauncher systemLauncher;
     private ServerAddress addr;
 
