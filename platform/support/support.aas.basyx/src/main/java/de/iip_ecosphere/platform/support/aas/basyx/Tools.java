@@ -30,7 +30,6 @@ import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.prop
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.aas.AssetKind;
-import de.iip_ecosphere.platform.support.aas.IdentifierType;
 import de.iip_ecosphere.platform.support.aas.Type;
 
 /**
@@ -224,10 +223,8 @@ public class Tools {
         IIdentifier result;
         if (null == id || id.length() == 0) {
             result = new CustomId(dfltCustom);
-        } else if (id.startsWith(IdentifierType.URN_PREFIX)) {
+        } else if (id.startsWith("urn:")) {
             result = new ModelUrn(id);
-        } else if (id.startsWith(IdentifierType.URN_TEXT_PREFIX)) {
-            result = new ModelUrn(id.substring(IdentifierType.URN_TEXT_PREFIX.length()));
         } else {
             result = new CustomId(id);
         } // IRI, others?
