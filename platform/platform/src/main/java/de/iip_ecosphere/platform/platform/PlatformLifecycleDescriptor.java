@@ -19,7 +19,6 @@ import de.iip_ecosphere.platform.services.ServicesLifecycleDescriptor;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.iip_ecosphere.platform.support.LifecycleExclude;
-import de.iip_ecosphere.platform.support.PidLifecycleDescriptor;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe;
@@ -32,7 +31,7 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
  * @author Holger Eichelberger, SSE
  */
 @LifecycleExclude({ServicesLifecycleDescriptor.class, EcsLifecycleDescriptor.class})
-public class PlatformLifecycleDescriptor implements LifecycleDescriptor, PidLifecycleDescriptor {
+public class PlatformLifecycleDescriptor implements LifecycleDescriptor {
 
     private Server registryServer;
     private Server aasServer;
@@ -71,11 +70,6 @@ public class PlatformLifecycleDescriptor implements LifecycleDescriptor, PidLife
     @Override
     public int priority() {
         return INIT_PRIORITY;
-    }
-
-    @Override
-    public String getPidFileName() {
-        return "iip-platform.pid";
     }
 
 }
