@@ -48,9 +48,6 @@ public class SslUtilsTest {
             Assert.assertNull(SslUtils.createTlsContext(null, passwd));
             SSLContext ctx = SslUtils.createTlsContext(keystore, passwd);
             Assert.assertNotNull(ctx);
-
-            ctx = SslUtils.createTlsContext(keystore, passwd, "qpid");
-            Assert.assertNotNull(ctx);
         } catch (IOException e) {
             Assert.fail("No I/O exception expected. " + e.getMessage());
         }
