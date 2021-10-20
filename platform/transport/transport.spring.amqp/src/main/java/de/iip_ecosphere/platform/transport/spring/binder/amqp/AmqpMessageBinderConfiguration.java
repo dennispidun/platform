@@ -43,17 +43,6 @@ public class AmqpMessageBinderConfiguration {
     public AmqpMessageBinderProvisioner amqpBinderProvisioner() {
         return new AmqpMessageBinderProvisioner(amqpClient);
     }
-    
-    /**
-     * Returns the client instance.
-     * 
-     * @return the client instance
-     */
-    @Bean
-    @ConditionalOnMissingBean
-    public AmqpClient amqpClient() {
-        return amqpClient;
-    }
 
     /**
      * Returns the message binder.
