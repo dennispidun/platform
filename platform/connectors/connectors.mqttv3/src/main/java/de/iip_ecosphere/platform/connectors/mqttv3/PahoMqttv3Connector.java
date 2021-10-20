@@ -216,12 +216,20 @@ public class PahoMqttv3Connector<CO, CI> extends AbstractChannelConnector<byte[]
         LOGGER.log(Level.SEVERE, message, th);
     }
 
-    @Override
+    /**
+     * Returns the supported encryption mechanisms.
+     * 
+     * @return the supported encryption mechanisms (comma-separated), may be <b>null</b> or empty
+     */
     public String supportedEncryption() {
         return SslUtils.CONTEXT_ALG_TLS;
     }
 
-    @Override
+    /**
+     * Returns the actually enabled encryption mechanisms on this instance.
+     * 
+     * @return the enabled encryption mechanisms (comma-separated), may be <b>null</b> or empty
+     */
     public String enabledEncryption() {
         return tlsEnabled ? SslUtils.CONTEXT_ALG_TLS : null;
     }
