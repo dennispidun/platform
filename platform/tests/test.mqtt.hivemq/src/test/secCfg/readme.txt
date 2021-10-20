@@ -1,13 +1,9 @@
-https://www.hivemq.com/docs/hivemq/4.7/user-guide/howtos.html
+based on https://www.hivemq.com/blog/end-to-end-encryption-in-the-cloud/
 
-server:
-keytool -genkey -alias qpid -keystore keystore.jks -validity 3650 -storepass a1234567 -keypass a1234567 -keyalg rsa -storetype jks -keysize 2048
-
-The first question asks about your first and last name. This is the common name of your certificate. Please enter the URL under which you will connect with your MQTT clients. For example, broker.yourdomain.com (for production) or localhost (for development). 
-
-for client using a PEM client certificate, e.g., mosquitto:
+keytool -genkey -alias qpid -keystore keystore.jks -validity 3650 -storepass a1234567 -keypass a1234567 -keyalg rsa -storetype jks
 keytool -exportcert -alias qpid -keystore keystore.jks -rfc -file server.pem
-
-for client using a trust store, e.g., PAHO:
-keytool -export -keystore keystore.jks -alias qpid -storepass a1234567 -file hivemq-server.crt
-keytool -import -file hivemq-server.crt -alias qpid -keystore client-trust-store.jks -storepass a1234567 -storetype jks
+openssl req -x509 -newkey rsa:2048 -keyout mqtt-client-key.pem -out mqtt-client-cert.pem -days 3650
+openssl x509 -outform der -in mqtt-client-cert.pem -out mqtt-client-cert.crt
+keytool -import -file mqtt-client-cert.crt -alias client -keystore trust-store.jks -storepass changeme
+  
+  
