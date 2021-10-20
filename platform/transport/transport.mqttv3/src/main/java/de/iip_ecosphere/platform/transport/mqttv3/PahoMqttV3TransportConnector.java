@@ -41,7 +41,6 @@ public class PahoMqttV3TransportConnector extends AbstractMqttTransportConnector
     
     private MqttAsyncClient client;
     private boolean tlsEnabled = false;
-    private int qos = MqttQoS.AT_LEAST_ONCE.value();
 
     /**
      * Creates a connector instance.
@@ -76,7 +75,6 @@ public class PahoMqttV3TransportConnector extends AbstractMqttTransportConnector
     @Override
     public void connect(TransportParameter params) throws IOException {
         super.connect(params);
-        this.qos = params.getMqttQoS().value();
         try {
             String broker;
             if (params.getKeystore() != null) {
@@ -150,7 +148,7 @@ public class PahoMqttV3TransportConnector extends AbstractMqttTransportConnector
     private void send(String stream, Object data, boolean block) throws IOException {
         byte[] payload = serialize(stream, data);
         MqttMessage message = new MqttMessage(payload);
-        message.setQos(qos);
+        message.setQos(MqttQoS.AT_LEAST_ONCE.value());
         try {
             IMqttDeliveryToken token = client.publish(stream, message);
             if (block) {
