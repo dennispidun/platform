@@ -11,11 +11,14 @@
 
 package de.iip_ecosphere.platform.transport.spring.binder.amqp;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
+
+import javax.net.ssl.SSLContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,13 +121,14 @@ public class AmqpClient {
                 factory.setAutomaticRecoveryEnabled(true);
                 factory.setUsername(config.getUser());
                 factory.setPassword(config.getPassword());
-                if (null != config.getKeystore()) {
-                    try {                
-                        factory.useSslProtocol(SslUtils.createTlsContext(config.getKeystore(), 
-                            config.getKeystorePassword(), config.getKeyAlias()));
-                    } catch (IOException e) {
-                        LOGGER.error("AMQP: Loading keystore " + e.getMessage() + ". Trying with no TLS.");
+                try {                
+                    File keystore = config.getKeystore();
+                    SSLContext ctx = SslUtils.createTlsContext(keystore, config.getKeystorePassword());
+                    if (null != ctx) {
+                        factory.useSslProtocol(ctx);
                     }
+                } catch (IOException e) {
+                    LOGGER.error("AMQP: Loading keystore " + e.getMessage() + ". Trying with no TLS.");
                 }
                 connection = factory.newConnection();
                 channel = connection.createChannel();
