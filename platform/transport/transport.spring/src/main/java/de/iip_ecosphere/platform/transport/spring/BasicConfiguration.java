@@ -62,18 +62,8 @@ public class BasicConfiguration {
      * Returns the password for the optional TLS keystore.
      * 
      * @return the TLS keystore, may be <b>null</b> for none
-     * @deprecated use {@link #getKeyPassword()}
      */
     public String getKeystorePassword() {
-        return keyPassword;
-    }
-    
-    /**
-     * Returns the password for the optional TLS keystore.
-     * 
-     * @return the TLS keystore, may be <b>null</b> for none
-     */
-    public String getKeyPassword() {
         return keyPassword;
     }
 
@@ -120,18 +110,8 @@ public class BasicConfiguration {
      * Returns the password for the optional TLS keystore.
      * 
      * @param keyPassword the TLS keystore, may be <b>null</b> for none
-     * @deprecated use {@link #setKeyPassword(String)}
      */
     public void setKeystorePassword(String keyPassword) {
-        this.keyPassword = keyPassword;
-    }
-    
-    /**
-     * Returns the password for the optional TLS keystore.
-     * 
-     * @param keyPassword the TLS keystore, may be <b>null</b> for none
-     */
-    public void setKeyPassword(String keyPassword) {
         this.keyPassword = keyPassword;
     }
 

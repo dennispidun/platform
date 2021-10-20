@@ -35,20 +35,17 @@ public class BasicConfigurationTest {
         final File keystore = new File("keys.jks");
         final int port = 1234;
         final String pass = "pass";
-        final String alias = "alias";
         
         BasicConfiguration c = new BasicConfiguration();
         c.setHost(host);
         c.setKeystore(keystore);
         c.setPort(port);
-        c.setKeyPassword(pass);
-        c.setKeyAlias(alias);
+        c.setKeystorePassword(pass);
         
         Assert.assertEquals(host, c.getHost());
         Assert.assertEquals(keystore, c.getKeystore());
         Assert.assertEquals(port, c.getPort());
-        Assert.assertEquals(pass, c.getKeyPassword());
-        Assert.assertEquals(alias, c.getKeyAlias());
+        Assert.assertEquals(pass, c.getKeystorePassword());
     }
 
 }
