@@ -119,7 +119,7 @@ public class ConnectorsAasTest {
         }
 
         @Override
-        public Object read() throws IOException {
+        protected Object read() throws IOException {
             return null;
         }
 
@@ -198,7 +198,7 @@ public class ConnectorsAasTest {
         }
 
         @Override
-        public byte[] read() throws IOException {
+        protected byte[] read() throws IOException {
             return null;
         }
 
