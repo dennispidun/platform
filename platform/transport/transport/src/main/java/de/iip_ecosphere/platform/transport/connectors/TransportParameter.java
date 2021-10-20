@@ -31,7 +31,6 @@ public class TransportParameter {
     private File keystore;
     private String keyPassword;
     private String keyAlias;
-    private boolean hostnameVerification = false;
     private String user; // preliminary, AMQP
     private String password; // preliminary, AMQP
 
@@ -157,17 +156,6 @@ public class TransportParameter {
             instance.keyAlias = alias;
             return this;
         }
-        
-        /**
-         * Returns whether TLS hostname verification shall be performed.
-         * 
-         * @param hostnameVerification {@code false} for no verification, {@code true} else
-         * @return <b>this</b>
-         */
-        public TransportParameterBuilder setHostnameVerification(boolean hostnameVerification) {
-            instance.hostnameVerification = hostnameVerification;
-            return this;
-        }
 
         /**
          * Returns the created instance.
@@ -290,15 +278,6 @@ public class TransportParameter {
      */
     public String getKeyAlias() {
         return keyAlias;
-    }
-    
-    /**
-     * Returns whether TLS hostname verification shall be performed.
-     * 
-     * @return {@code false} for no verification (default), {@code true} else
-     */
-    public boolean getHostnameVerification() {
-        return hostnameVerification;
     }
 
 }
