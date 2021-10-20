@@ -23,17 +23,7 @@
   <dependencies>
     <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>
-     <artifactId>support.iip-aas</artifactId>
-     <version>${project.version}</version>
-    </dependency>
-    <dependency>
-     <groupId>de.iip-ecosphere.platform</groupId>
-     <artifactId>transport</artifactId>
-     <version>${project.version}</version>
-    </dependency>
-    <dependency>
-     <groupId>de.iip-ecosphere.platform</groupId>
-     <artifactId>deviceMgt</artifactId>
+     <artifactId>deviceMgt.api</artifactId>
      <version>${project.version}</version>
     </dependency>
 
@@ -43,18 +33,6 @@
       <version>3.3.1</version>
     </dependency>
 
-    <dependency>
-     <groupId>de.iip-ecosphere.platform</groupId>
-     <artifactId>transport.amqp</artifactId>
-     <version>${project.version}</version>
-     <scope>test</scope>
-    </dependency>
-    <dependency>
-     <groupId>de.iip-ecosphere.platform</groupId>
-     <artifactId>support.aas.basyx</artifactId>
-     <version>${project.version}</version>
-     <scope>test</scope>
-    </dependency>  
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

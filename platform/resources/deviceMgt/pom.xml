@@ -44,6 +44,13 @@
       <version>4.9.2</version>
     </dependency>
 
+
+    <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>deviceMgt.thingsboard</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>transport.amqp</artifactId>
@@ -74,5 +81,36 @@
     <scope>test</scope>
   </dependency>
   </dependencies>
-
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9</version>
+                <configuration>
+                    <doclet>org.stfm.texdoclet.TeXDoclet</doclet>
+                    <docletArtifact>
+                        <groupId>org.stfm</groupId>
+                        <artifactId>texdoclet</artifactId>
+                        <version>0.9-SNAPSHOT</version>
+                    </docletArtifact>
+                    <!--<sourcepath>src/main/java:src/test/java</sourcepath>-->
+                    <useStandardDocletOptions>false</useStandardDocletOptions>
+                    <destDir>apidocs_tex</destDir>
+                    <additionalparam>
+                        -tree
+                        -hyperref
+                        -output out.tex
+                        -include
+                        -title "TeXDoclet Java Documentation"
+                        -subtitle "Created with Javadoc TeXDoclet Doclet"
+                        -author "Greg Wonderly \and S{\"o}ren Caspersen \and Stefan Marx"
+                        -subpackages de.iip_ecosphere.platform.deviceMgt
+                        -sectionlevel subsection
+                        -shortinherited
+                    </additionalparam>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
