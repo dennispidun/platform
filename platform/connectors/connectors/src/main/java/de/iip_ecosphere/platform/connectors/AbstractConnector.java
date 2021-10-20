@@ -238,20 +238,8 @@ public abstract class AbstractConnector<O, I, CO, CI> implements Connector<O, I,
      * @throws IOException if receiving/translation fails
      */
     protected CO received(O data) throws IOException {
-        return received(data, true);
-    }
-    
-    /**
-     * Call this if data was received. 
-     * 
-     * @param data the received data, further processed if {@link #callback} is not <b>null</b>
-     * @param notifyCallback whether the {@link #callback} shall be notified
-     * @return returns the translated received data
-     * @throws IOException if receiving/translation fails
-     */
-    protected CO received(O data, boolean notifyCallback) throws IOException {
         CO result = selector.selectSouthOutput(data).adaptOutput(data);
-        if (null != callback && notifyCallback) {
+        if (null != callback) {
             callback.received(result);
         }
         return result;
@@ -263,11 +251,11 @@ public abstract class AbstractConnector<O, I, CO, CI> implements Connector<O, I,
     }
     
     @Override
-    public CO request(boolean notifyCallback) throws IOException {
+    public CO request(boolean sendToCallback) throws IOException {
         CO result = null;
         O data = read();
-        if (null != data) {
-            result = received(data, notifyCallback);
+        if (null != data && sendToCallback) {
+            result = received(data);
         }
         return result;
     }
