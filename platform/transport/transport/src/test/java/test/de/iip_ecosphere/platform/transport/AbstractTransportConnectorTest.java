@@ -55,22 +55,6 @@ public class AbstractTransportConnectorTest {
     }
     
     /**
-     * Allows to configure the transport parameters.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    public interface TransportParameterConfigurer {
-
-        /**
-         * Further setup/configuration of the builder.
-         * 
-         * @param builder the builder
-         */
-        public void configure(TransportParameterBuilder builder);
-        
-    }
-
-    /**
      * Implements the test using the {@link TransportFactory}.
      * 
      * @param addr the server address
@@ -79,30 +63,13 @@ public class AbstractTransportConnectorTest {
      */
     public static void doTest(ServerAddress addr, Class<? extends Serializer<Product>> serializerType) 
         throws IOException {
-        doTest(addr, serializerType, null);
-    }
-    
-    /**
-     * Implements the test using the {@link TransportFactory}.
-     * 
-     * @param addr the server address
-     * @param serializerType the serializer type to use
-     * @param configurer the optional transport parameter configurer (may be <b>null</b>)
-     * @throws IOException in case that connection/communication fails
-     */
-    public static void doTest(ServerAddress addr, Class<? extends Serializer<Product>> serializerType, 
-        TransportParameterConfigurer configurer) throws IOException {
         Product data1 = new Product("prod1", 10.2);
         Product data2 = new Product("prod2", 5.1);
 
         System.out.println("Using serializer: " + serializerType.getSimpleName());
         SerializerRegistry.registerSerializer(serializerType);
-        TransportParameterBuilder tpb1 = TransportParameterBuilder.newBuilder(addr.getHost(), addr.getPort())
-            .setApplicationId("cl1");
-        if (null != configurer) {
-            configurer.configure(tpb1);
-        }
-        TransportParameter param1 = tpb1.build();
+        TransportParameter param1 = TransportParameterBuilder.newBuilder(addr.getHost(), addr.getPort())
+            .setApplicationId("cl1").build();
         TransportConnector cl1 = TransportFactory.createConnector();
         Assert.assertTrue(cl1.getName().length() > 0);
         System.out.println("Connecting connector 1");
@@ -112,11 +79,7 @@ public class AbstractTransportConnectorTest {
         final Callback cb1 = new Callback();
         cl1.setReceptionCallback(stream2, cb1);
 
-        TransportParameterBuilder tpb2 = TransportParameterBuilder.newBuilder(addr).setApplicationId("cl2");
-        if (null != configurer) {
-            configurer.configure(tpb2);
-        }
-        TransportParameter param2 = tpb2.build();
+        TransportParameter param2 = TransportParameterBuilder.newBuilder(addr).setApplicationId("cl2").build();
         TransportConnector cl2 = TransportFactory.createConnector();
         Assert.assertTrue(cl2.getName().length() > 0);
         System.out.println("Connecting connector 2");
