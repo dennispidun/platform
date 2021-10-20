@@ -115,8 +115,6 @@ public class RabbitMqAmqpTransportConnector extends AbstractTransportConnector {
         }
         configureFactory(factory);
         try {
-            LoggerFactory.getLogger(getClass()).info(
-                "AMQP: Connecting to " + params.getHost() + " " + params.getPort());
             connection = factory.newConnection();
             channel = connection.createChannel();
         } catch (TimeoutException e) {
