@@ -12,10 +12,8 @@
 
 package test.de.iip_ecosphere.platform.support;
 
-import java.io.File;
 import java.util.ServiceLoader;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -65,11 +63,6 @@ public class LifecycleHandlerTest {
         public int priority() {
             return INIT_PRIORITY;
         }
-
-        @Override
-        public String getPidFileName() {
-            return null;
-        }
         
     }
 
@@ -108,11 +101,6 @@ public class LifecycleHandlerTest {
         public boolean continueWaiting() {
             return waitingCount++ < 10;
         }
-
-        @Override
-        public String getPidFileName() {
-            return "lcdesc2.pid";
-        }
         
     }
     
@@ -148,7 +136,6 @@ public class LifecycleHandlerTest {
         shutdownHookCalledCount = 0;
         countDescriptors = 0;
         LifecycleHandler.OneShotStarter.main(cmdArgs);
-        Assert.assertTrue(new File(FileUtils.getTempDirectory(), "lcdesc2.pid").exists());
         Assert.assertEquals(2, shutdownHookCount);
         Assert.assertEquals(2, startupCount);
         Assert.assertEquals(2, shutdownCount);
@@ -168,7 +155,6 @@ public class LifecycleHandlerTest {
         countDescriptors = 0;
 
         LifecycleHandler.WaitingStarter.main(cmdArgs);
-        Assert.assertTrue(new File(FileUtils.getTempDirectory(), "lcdesc2.pid").exists());
         Assert.assertEquals(2, shutdownHookCount);
         Assert.assertEquals(2, startupCount);
         // shutdowns not guaranteed
@@ -188,7 +174,6 @@ public class LifecycleHandlerTest {
         countDescriptors = 0;
 
         LifecycleHandler.WaitingStarterWithShutdown.main(cmdArgs);
-        Assert.assertTrue(new File(FileUtils.getTempDirectory(), "lcdesc2.pid").exists());
         Assert.assertEquals(2, shutdownHookCount);
         Assert.assertEquals(2, startupCount);
         Assert.assertEquals(2, shutdownCount);
