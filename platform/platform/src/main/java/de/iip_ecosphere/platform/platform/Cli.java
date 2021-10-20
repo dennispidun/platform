@@ -18,7 +18,6 @@ import java.net.URISyntaxException;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 import de.iip_ecosphere.platform.deviceMgt.DeviceRemoteManagementOperations;
 import de.iip_ecosphere.platform.ecsRuntime.EcsClient;
@@ -247,11 +246,11 @@ public class Cli {
             switch (cmd.toLowerCase()) {
             case "listservices":
                 changedServices = checkReload(client.getServices(), changedServices);
-                print(client.getServices(), "- Service ", null, PrintType.NO, PrintType.PREFIX);
+                print(client.getServices(), "- Service ", PrintType.NO, PrintType.PREFIX);
                 break;
             case "listartifacts":
                 changedArtifacts = checkReload(client.getArtifacts(), changedArtifacts);
-                print(client.getArtifacts(), "- Artifact ", null, PrintType.NO, PrintType.PREFIX);
+                print(client.getArtifacts(), "- Artifact ", PrintType.NO, PrintType.PREFIX);
                 break;
             case "add":
                 String uri = provider.nextCommand();
@@ -320,7 +319,7 @@ public class Cli {
             switch (cmd.toLowerCase()) {
             case "list":
                 changed = checkReload(client.getContainers(), changed);
-                print(client.getContainers(), "- Container ", null, PrintType.NO, PrintType.PREFIX);
+                print(client.getContainers(), "- Container ", PrintType.NO, PrintType.PREFIX);
                 break;
             case "add":
                 String uri = provider.nextCommand();
@@ -420,8 +419,7 @@ public class Cli {
      */
     private static void listResources() {
         try {
-            print(resourcesFactory.create().getResources(), "- Resource ", 
-                c -> !c.getIdShort().equals("containers"), PrintType.PREFIX);
+            print(resourcesFactory.create().getResources(), "- Resource ", PrintType.NO, PrintType.PREFIX);
         } catch (IOException e) {
             println(e);
         }
@@ -444,13 +442,11 @@ public class Cli {
      * @param elt the element to print
      * @param collPrefix a prefix string to be printed before the name of collection, may be <b>null</b> for not 
      *     printing the collection name
-     * @param filter optional submodel elements collection filter, may be <b>null</b> for none
      * @param skipLevel how to handle printout per level, if not given {@link PrintType#PREFIX} is used
      */
-    private static void print(SubmodelElement elt, String collPrefix, Predicate<SubmodelElementCollection> filter, 
-        PrintType... skipLevel) {
+    private static void print(SubmodelElement elt, String collPrefix, PrintType... skipLevel) {
         if (null != elt) {
-            PrintVisitor vis = new PrintVisitor(collPrefix, filter, skipLevel);
+            PrintVisitor vis = new PrintVisitor(collPrefix, skipLevel);
             elt.accept(vis);
         } else {
             println("None.");
@@ -461,15 +457,13 @@ public class Cli {
      * Prints a sub-model using {@link PrintVisitor}.
      * 
      * @param submodel the sub-model to print
-     * @param filter optional submodel elements collection filter, may be <b>null</b> for none
      * @param collPrefix a prefix string to be printed before the name of collection, may be <b>null</b> for not 
      *     printing the collection name
      * @param skipLevel how to handle printout per level, if not given {@link PrintType#PREFIX} is used
      */
-    private static void print(Submodel submodel, String collPrefix, Predicate<SubmodelElementCollection> filter, 
-        PrintType... skipLevel) {
+    private static void print(Submodel submodel, String collPrefix, PrintType... skipLevel) {
         if (null != submodel) {
-            PrintVisitor vis = new PrintVisitor(collPrefix, filter, skipLevel);
+            PrintVisitor vis = new PrintVisitor(collPrefix, skipLevel);
             submodel.accept(vis);
         } else {
             println("None.");
