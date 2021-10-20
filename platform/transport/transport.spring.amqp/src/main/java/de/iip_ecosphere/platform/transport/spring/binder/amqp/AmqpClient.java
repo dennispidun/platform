@@ -19,7 +19,6 @@ import java.util.concurrent.TimeoutException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -34,7 +33,6 @@ import com.rabbitmq.client.DeliverCallback;
  * 
  * @author Holger Eichelberger, SSE
  */
-@Component
 public class AmqpClient {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AmqpMessageBinder.class); // map all to binder
