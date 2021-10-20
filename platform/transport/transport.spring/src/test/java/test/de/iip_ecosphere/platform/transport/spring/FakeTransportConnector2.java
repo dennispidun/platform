@@ -43,12 +43,20 @@ public class FakeTransportConnector2 implements TransportConnector {
         return "Fake 2";
     }
 
-    @Override
+    /**
+     * Returns the supported encryption mechanisms.
+     * 
+     * @return the supported encryption mechanisms, may be <b>null</b> or empty
+     */
     public String supportedEncryption() {
         return null;
     }
 
-    @Override
+    /**
+     * Returns the actually enabled encryption mechanisms on this instance.
+     * 
+     * @return the enabled encryption mechanisms, may be <b>null</b> or empty
+     */
     public String enabledEncryption() {
         return null;
     }
