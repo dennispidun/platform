@@ -17,10 +17,10 @@ import java.io.IOException;
 import org.eclipse.basyx.aas.manager.ConnectedAssetAdministrationShellManager;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.ModelUrn;
 import org.eclipse.basyx.aas.metamodel.map.descriptor.SubmodelDescriptor;
-import org.eclipse.basyx.aas.registration.api.IAASRegistry;
+import org.eclipse.basyx.aas.registration.api.IAASRegistryService;
 import org.eclipse.basyx.aas.registration.proxy.AASRegistryProxy;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
-import org.eclipse.basyx.vab.protocol.http.connector.HTTPConnectorFactory;
+import org.eclipse.basyx.vab.protocol.http.connector.HTTPConnectorProvider;
 
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.aas.Aas;
@@ -35,7 +35,7 @@ import de.iip_ecosphere.platform.support.aas.Submodel;
 public class BaSyxRegistry implements Registry {
 
     private Endpoint endpoint;
-    private IAASRegistry registry;
+    private IAASRegistryService registry;
     private ConnectedAssetAdministrationShellManager manager;
 
     // checkstyle: stop exception type check
@@ -50,7 +50,7 @@ public class BaSyxRegistry implements Registry {
         this.endpoint = endpoint;
         try {
             registry = new AASRegistryProxy(this.endpoint.toUri());
-            HTTPConnectorFactory connectorProvider = new HTTPConnectorFactory(); // TODO HTTPS?
+            HTTPConnectorProvider connectorProvider = new HTTPConnectorProvider(); // TODO HTTPS?
             manager = new ConnectedAssetAdministrationShellManager(
                 registry, connectorProvider);
         } catch (Exception e) {
@@ -79,7 +79,7 @@ public class BaSyxRegistry implements Registry {
     @Override
     public Submodel retrieveSubmodel(String aasUrn, String submodelUrn) throws IOException {
         ModelUrn aasURN = new ModelUrn(aasUrn);
-        return new BaSyxISubmodel(obtainAas(aasURN), manager.retrieveSubmodel(aasURN, new ModelUrn(submodelUrn)));
+        return new BaSyxISubmodel(obtainAas(aasURN), manager.retrieveSubModel(aasURN, new ModelUrn(submodelUrn)));
     }
 
     @Override
@@ -101,7 +101,7 @@ public class BaSyxRegistry implements Registry {
             throw new IllegalArgumentException("The submodel must be created by the AasFactory.");
         }
         IIdentifier aasIdentifier = ((BaSyxAas) aas).getAas().getIdentification();
-        manager.createSubmodel(aasIdentifier, ((BaSyxSubmodel) submodel).getSubmodel());
+        manager.createSubModel(aasIdentifier, ((BaSyxSubmodel) submodel).getSubmodel());
     }
 
     @Override

@@ -15,7 +15,7 @@ package de.iip_ecosphere.platform.support.aas.basyx;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
+import org.eclipse.basyx.submodel.metamodel.api.ISubModel;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElementCollection;
 
 import de.iip_ecosphere.platform.support.aas.Reference;
@@ -52,7 +52,7 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
      * 
      * @author Holger Eichelberger, SSE
      */
-    public static class BaSyxSubmodelElementCollectionBuilder extends BaSyxSubmodelElementContainerBuilder<ISubmodel> 
+    public static class BaSyxSubmodelElementCollectionBuilder extends BaSyxSubmodelElementContainerBuilder<ISubModel> 
         implements SubmodelElementCollectionBuilder {
         
         private BaSyxSubmodelElementContainerBuilder<?> parentBuilder;
@@ -143,26 +143,26 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
 
         @Override
         BaSyxOperation register(BaSyxOperation operation) {
-            this.collection.addSubmodelElement(operation.getSubmodelElement());
+            this.collection.addSubModelElement(operation.getSubmodelElement());
             return instance.register(operation);
         }
         
         @Override
         BaSyxProperty register(BaSyxProperty property) {
-            this.collection.addSubmodelElement(property.getSubmodelElement());
+            this.collection.addSubModelElement(property.getSubmodelElement());
             BaSyxProperty p = instance.register(property);
             return p;
         }
 
         @Override
         BaSyxReferenceElement register(BaSyxReferenceElement reference) {
-            this.collection.addSubmodelElement(reference.getSubmodelElement());
+            this.collection.addSubModelElement(reference.getSubmodelElement());
             return instance.register(reference);
         }
 
         @Override
         BaSyxSubmodelElementCollection register(BaSyxSubmodelElementCollection collection) {
-            this.collection.addSubmodelElement(collection.getSubmodelElement());
+            this.collection.addSubModelElement(collection.getSubmodelElement());
             return instance.register(collection);
         }
         
@@ -207,7 +207,7 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
         }
 
         @Override
-        protected AbstractSubmodel<ISubmodel> getInstance() {
+        protected AbstractSubmodel<ISubModel> getInstance() {
             return null;
         }
 

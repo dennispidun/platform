@@ -27,7 +27,7 @@ import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
 import org.eclipse.basyx.vab.modelprovider.generic.IVABElementHandler;
 import org.eclipse.basyx.vab.modelprovider.generic.VABModelProvider;
 import org.eclipse.basyx.vab.protocol.basyx.server.BaSyxTCPServer;
-import org.eclipse.basyx.vab.protocol.http.server.BaSyxHTTPServer;
+import org.eclipse.basyx.vab.protocol.http.server.AASHTTPServer;
 import org.eclipse.basyx.vab.protocol.http.server.VABHTTPInterface;
 import org.slf4j.LoggerFactory;
 
@@ -114,12 +114,12 @@ public class VabOperationsProvider extends HashMap<String, Object> implements Op
     private enum Kind {
         
         /**
-         * 'Refers' to {@link VabOperationsProvider#properties}.
+         * 'Refers' to {@link VabIipOperationsProvider#properties}.
          */
         PROPERTY,
 
         /**
-         * 'Refers' to {@link VabOperationsProvider#operations}.
+         * 'Refers' to {@link VabIipOperationsProvider#operations}.
          */
         OPERATION
     }
@@ -276,7 +276,7 @@ public class VabOperationsProvider extends HashMap<String, Object> implements Op
             // schema == SCHEMA.HTTPS requires new DeploymentSpec(endpoint, true, keyPath, keyPass)
             deploymentSpec.getContext().addServletMapping(Endpoint.checkEndpoint(endpoint.getEndpoint()) + "/*", 
                 vabServlet);
-            BaSyxHTTPServer server = new BaSyxHTTPServer(deploymentSpec.getContext());
+            AASHTTPServer server = new AASHTTPServer(deploymentSpec.getContext());
             Server result = new Server() {
 
                 @Override
