@@ -91,9 +91,4 @@ public class PahoMqttv3ConnectorTest extends AbstractSerializingConnectorTest {
         };
     }
 
-    @Override
-    protected boolean implementsEncryption() {
-        return true;
-    }
-
 }

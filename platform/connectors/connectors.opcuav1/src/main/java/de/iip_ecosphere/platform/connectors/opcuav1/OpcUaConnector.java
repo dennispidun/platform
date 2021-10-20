@@ -548,14 +548,4 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
         
     }
 
-    @Override
-    public String supportedEncryption() {
-        return null;
-    }
-
-    @Override
-    public String enabledEncryption() {
-        return null;
-    }
-
 }
