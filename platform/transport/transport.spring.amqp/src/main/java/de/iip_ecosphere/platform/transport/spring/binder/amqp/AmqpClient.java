@@ -26,37 +26,20 @@ import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
 
 /**
- * An AMQP client for a single binder instance. Typically, different binders subscribe to different
+ * A central AMQP client for all binders to reduce resource usage. Typically, different binders subscribe to different
  * topics. The implementation uses queuing/a consumer pattern to cope with threading problems.
  * 
- * Partially public for testing.
+ * Partially public for testing. Initial implementation, not optimized.
  * 
  * @author Holger Eichelberger, SSE
  */
 public class AmqpClient {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AmqpMessageBinder.class); // map all to binder
-    private static AmqpClient lastInstance;
-    private Connection connection;
-    private Channel channel;
-    private AmqpConfiguration configuration;
-    private Set<String> topics = Collections.synchronizedSet(new HashSet<>());
-    
-    /**
-     * Creates and registers an instance.
-     */
-    public AmqpClient() {
-        lastInstance = this;
-    }
-    
-    /**
-     * Returns the last instance created for this class. [testing]
-     * 
-     * @return the last instance
-     */
-    public static AmqpClient getLastInstance() {
-        return lastInstance;
-    }
+    private static Connection connection;
+    private static Channel channel;
+    private static AmqpConfiguration configuration;
+    private static Set<String> topics = Collections.synchronizedSet(new HashSet<>());
     
     /**
      * Called when a message for a topic arrives.
@@ -81,7 +64,7 @@ public class AmqpClient {
      * @param topic the topic
      * @throws IOException if registering the queue fails
      */
-    private void ensureTopicQueue(String topic) throws IOException {
+    private static void ensureTopicQueue(String topic) throws IOException {
         if (!topics.contains(topic)) {
             channel.queueDeclare(topic, false, false, true, null);
             topics.add(topic);
@@ -93,7 +76,7 @@ public class AmqpClient {
      * 
      * @param config the AMQP configuration to take the connection information from
      */
-    synchronized void createClient(AmqpConfiguration config) {
+    static synchronized void createClient(AmqpConfiguration config) {
         if (null == channel) {
             try {
                 configuration = config;
@@ -115,7 +98,7 @@ public class AmqpClient {
     /**
      * Stops the client.
      */
-    public void stopClient() {
+    public static void stopClient() {
         try {
             channel.close();
             topics.clear();
@@ -135,7 +118,7 @@ public class AmqpClient {
      * @param arrivedCallback the callback to be called when a message arrived
      * @return {@code true} if done/successful, {@code false} else
      */
-    boolean subscribeTo(String topic, ArrivedCallback arrivedCallback) {
+    static boolean subscribeTo(String topic, ArrivedCallback arrivedCallback) {
         boolean done = false;
         if (!configuration.isFilteredTopic(topic) && null != channel) {
             try {
@@ -160,7 +143,7 @@ public class AmqpClient {
      * @param topic the topic to unsubscribe from
      * @return {@code true} if done/successful, {@code false} else
      */
-    boolean unsubscribeFrom(String topic) {
+    static boolean unsubscribeFrom(String topic) {
         boolean done = false;
         if (!configuration.isFilteredTopic(topic) && null != channel) {
             if (!topics.contains(topic)) {
@@ -183,7 +166,7 @@ public class AmqpClient {
      * @param topic the topic to send to
      * @param payload the payload to send
      */
-    void send(String topic, byte[] payload) {
+    static void send(String topic, byte[] payload) {
         if (null != channel) {
             try {
                 ensureTopicQueue(topic);

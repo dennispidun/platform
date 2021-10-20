@@ -134,9 +134,7 @@ public class AmqpMessageBinderTest {
      */
     @AfterClass
     public static void shutdown() {
-        if (null != AmqpClient.getLastInstance()) {
-            AmqpClient.getLastInstance().stopClient();
-        }
+        AmqpClient.stopClient();
         server.stop(true);
         SerializerRegistry.unregisterSerializer(StringSerializer.class);
         SerializerRegistry.resetDefaults();

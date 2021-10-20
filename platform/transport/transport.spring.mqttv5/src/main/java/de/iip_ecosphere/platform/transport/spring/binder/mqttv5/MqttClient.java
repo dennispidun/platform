@@ -31,7 +31,7 @@ import de.iip_ecosphere.platform.transport.connectors.basics.MqttQoS;
 import de.iip_ecosphere.platform.transport.connectors.impl.AbstractTransportConnector;
 
 /**
- * A MQTT client for a single binder instance. Typically, different binders subscribe to different
+ * A central MQTT client for all binders to reduce resource usage. Typically, different binders subscribe to different
  * topics. 
  * 
  * Partially public for testing. Initial implementation, not optimized.
@@ -41,27 +41,10 @@ import de.iip_ecosphere.platform.transport.connectors.impl.AbstractTransportConn
 public class MqttClient {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MqttV5MessageBinder.class); // map all to binder
-    private static MqttClient lastInstance;
     private static MqttAsyncClient client;
     private static MqttConfiguration configuration;
     private static Callback callback;
     private static MqttQoS qos = MqttQoS.AT_LEAST_ONCE;
-    
-    /**
-     * Creates and registers an instance.
-     */
-    public MqttClient() {
-        lastInstance = this;
-    }
-    
-    /**
-     * Returns the last instance created for this class. [testing]
-     * 
-     * @return the last instance
-     */
-    public static MqttClient getLastInstance() {
-        return lastInstance;
-    }
     
     /**
      * Called when a message for a topic arrives.
@@ -153,7 +136,7 @@ public class MqttClient {
      * 
      * @param config the MQTT configuration to take the connection information from
      */
-    synchronized void createClient(MqttConfiguration config) {
+    static synchronized void createClient(MqttConfiguration config) {
         if (null == client) {
             try {
                 configuration = config;
@@ -180,7 +163,7 @@ public class MqttClient {
     /**
      * Stops the client.
      */
-    public void stopClient() {
+    public static void stopClient() {
         try {
             waitForCompletion(client.disconnect());
             client.close();
@@ -199,7 +182,7 @@ public class MqttClient {
      * @param arrivedCallback the callback to be called when a message arrived
      * @return {@code true} if done/successful, {@code false} else
      */
-    boolean subscribeTo(String topic, ArrivedCallback arrivedCallback) {
+    static boolean subscribeTo(String topic, ArrivedCallback arrivedCallback) {
         boolean done = false;
         if (!configuration.isFilteredTopic(topic) && null != client) {
             try {
@@ -221,7 +204,7 @@ public class MqttClient {
      * @param topic the topic to unsubscribe from
      * @return {@code true} if done/successful, {@code false} else
      */
-    boolean unsubscribeFrom(String topic) {
+    static boolean unsubscribeFrom(String topic) {
         boolean done = false;
         if (!configuration.isFilteredTopic(topic) && null != client) {
             try {
@@ -242,7 +225,7 @@ public class MqttClient {
      * @param topic the topic to send to
      * @param payload the payload to send
      */
-    void send(String topic, byte[] payload) {
+    static void send(String topic, byte[] payload) {
         if (null != client) {
             MqttMessage message = new MqttMessage(payload);
             message.setQos(qos.value()); 
