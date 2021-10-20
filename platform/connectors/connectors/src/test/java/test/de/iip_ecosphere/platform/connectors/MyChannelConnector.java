@@ -109,14 +109,4 @@ public class MyChannelConnector<CO, CI> extends AbstractChannelConnector<byte[],
         return received.poll();
     }
 
-    @Override
-    public String supportedEncryption() {
-        return null;
-    }
-
-    @Override
-    public String enabledEncryption() {
-        return null;
-    }
-
 }
