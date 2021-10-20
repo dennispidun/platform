@@ -18,6 +18,7 @@ import java.util.concurrent.ExecutionException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.iip_ecosphere.platform.deviceMgt.Credentials;
 import de.iip_ecosphere.platform.ecsRuntime.ssh.RemoteAccessServer;
 import de.iip_ecosphere.platform.ecsRuntime.ssh.RemoteAccessServerFactory;
 import org.slf4j.Logger;
@@ -179,7 +180,7 @@ public class EcsAas implements AasContributor {
 
         sBuilder.defineOperation(getQName(NAME_OP_CREATE_REMOTE_CONNECTION_CREDENTIALS),
             p -> {
-                RemoteAccessServer.Credentials credentials = RemoteAccessServerFactory.create()
+                Credentials credentials = RemoteAccessServerFactory.create()
                         .getCredentialsManager()
                         .addGeneratedCredentials();
                 ObjectMapper mapper = new ObjectMapper();

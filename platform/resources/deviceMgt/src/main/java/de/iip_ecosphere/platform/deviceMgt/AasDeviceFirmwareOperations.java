@@ -12,9 +12,10 @@
 
 package de.iip_ecosphere.platform.deviceMgt;
 
+import de.iip_ecosphere.platform.deviceMgt.ecs.EcsAasClient;
+import de.iip_ecosphere.platform.deviceMgt.ssh.SshRemoteManagementOperations;
 import de.iip_ecosphere.platform.deviceMgt.storage.Storage;
 import de.iip_ecosphere.platform.deviceMgt.storage.StorageFactory;
-import de.iip_ecosphere.platform.ecsRuntime.EcsAasClient;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;

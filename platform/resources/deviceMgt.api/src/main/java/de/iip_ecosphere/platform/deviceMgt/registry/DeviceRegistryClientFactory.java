@@ -12,22 +12,19 @@
 
 package de.iip_ecosphere.platform.deviceMgt.registry;
 
-import static org.mockito.Mockito.mock;
 
-public class StubDeviceRegistryFactoryDescriptor implements DeviceRegistryFactoryDescriptor {
+import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 
-    private static DeviceRegistry stub;
+/**
 
-    public static DeviceRegistry mockDeviceRegistry() {
-        if (stub == null) {
-            stub = mock(DeviceRegistry.class);
-        }
-        return stub;
-    }
+ * @author Dennis Pidun, University of Hildesheim
+ */
+public class DeviceRegistryClientFactory {
 
-    @Override
-    public DeviceRegistry createDeviceRegistryInstance() {
-        return mockDeviceRegistry();
+    public static DeviceRegistryClient createDeviceRegistryClient() {
+        return ServiceLoaderUtils
+            .findFirst(DeviceRegistryClient.class)
+            .orElse(null);
     }
 
 }

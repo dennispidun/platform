@@ -12,12 +12,16 @@
 
 package de.iip_ecosphere.platform.deviceMgt.ssh;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import de.iip_ecosphere.platform.deviceMgt.Credentials;
 import de.iip_ecosphere.platform.deviceMgt.DeviceRemoteManagementOperations;
+import de.iip_ecosphere.platform.deviceMgt.ecs.EcsAasClient;
 import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryAas;
 import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryAasClient;
-import de.iip_ecosphere.platform.ecsRuntime.EcsAasClient;
-import de.iip_ecosphere.platform.ecsRuntime.ssh.RemoteAccessServer;
 import de.iip_ecosphere.platform.support.aas.Property;
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import de.iip_ecosphere.platform.support.iip_aas.SubmodelElementsCollectionClient;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
@@ -30,10 +34,12 @@ import java.util.concurrent.ExecutionException;
  */
 public class SshRemoteManagementOperations implements DeviceRemoteManagementOperations {
 
+
     @Override
     public SSHConnectionDetails establishSsh(String id) throws ExecutionException {
-        RemoteAccessServer.Credentials credentials = null;
+
         String deviceIp = null;
+        Credentials credentials = null;
         try {
             credentials = new EcsAasClient(id).createRemoteConnectionCredentials();
             Property ipProp = new DeviceRegistryAasClient().getDevice(id).getProperty(DeviceRegistryAas.NAME_PROP_DEVICE_IP);

@@ -1,6 +1,6 @@
 package de.iip_ecosphere.platform.ecsRuntime.ssh;
 
-import de.iip_ecosphere.platform.ecsRuntime.ssh.RemoteAccessServer.Credentials;
+import de.iip_ecosphere.platform.deviceMgt.Credentials;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,7 +12,7 @@ public class RemoteAccessServerTest {
     private RemoteAccessServer remoteAccessServer;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         remoteAccessServer = RemoteAccessServerFactory.create();
     }
 
@@ -44,15 +44,5 @@ public class RemoteAccessServerTest {
         Assert.assertNotNull(credentials1);
         Assert.assertEquals(credentials.getKey(), credentials1.getKey());
         Assert.assertEquals(credentials.getSecret(), credentials1.getSecret());
-    }
-
-    @Test
-    public void name() {
-        RemoteAccessServer remoteAccessServer = RemoteAccessServerFactory.create();
-        remoteAccessServer.start();
-        remoteAccessServer.getCredentialsManager().addCredentials(new Credentials("abc", "abc"));
-        while(true) {
-
-        }
     }
 }

@@ -2,10 +2,8 @@ package test.de.iip_ecosphere.platform.ecsRuntime;
 
 import de.iip_ecosphere.platform.deviceMgt.DeviceDescriptor;
 import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistry;
-import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryAas;
 import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryFactoryDescriptor;
 import de.iip_ecosphere.platform.ecsRuntime.DeviceManagement;
-import de.iip_ecosphere.platform.ecsRuntime.EcsAas;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
@@ -35,8 +33,7 @@ public class DeviceManagementTest {
     @BeforeClass
     public static void startup() throws IOException {
         AasPartRegistry.AasBuildResult res = AasPartRegistry
-                .build(c -> c instanceof DeviceRegistryAas
-                        || c instanceof EcsAas);
+                .build();
         AasPartRegistry.setAasSetup(AasPartRegistry.AasSetup.createLocalEphemeralSetup());
         implServer = res.getProtocolServerBuilder().build();
         implServer.start();
@@ -68,8 +65,8 @@ public class DeviceManagementTest {
         SubmodelElementCollection device = DeviceManagement.getRegistryClient()
                 .getDevice(Id.getDeviceIdAas());
         Assert.assertNotNull(device);
-        Assert.assertNotNull(device.getProperty(DeviceRegistryAas.NAME_PROP_DEVICE_IP));
-        Property deviceId = device.getProperty(DeviceRegistryAas.NAME_PROP_MANAGED_DEVICE_ID);
+        Assert.assertNotNull(device.getProperty("ip"));
+        Property deviceId = device.getProperty("managedId");
         Assert.assertNotNull(deviceId);
         Assert.assertNotNull(deviceId.getValue());
     }

@@ -11,7 +11,8 @@ import java.util.*;
 
 public class ThingsBoardDeviceDescriptor implements DeviceDescriptor {
 
-    public static final int DEVICE_TIMEOUT = 15000;
+    // for testing not final
+    public static int DEVICE_TIMEOUT = 15000;
     private Device tbDevice;
     private RestClient tbClient;
 
@@ -66,9 +67,7 @@ public class ThingsBoardDeviceDescriptor implements DeviceDescriptor {
                 .max(Comparator.comparingLong(TsKvEntry::getTs))
                 .orElse(null);
 
-        if (latest == null) {
-            return State.STARTING;
-        } else if (System.currentTimeMillis() - latest.getTs() < DEVICE_TIMEOUT) {
+        if (System.currentTimeMillis() - latest.getTs() < DEVICE_TIMEOUT) {
             return State.AVAILABLE;
         }
 

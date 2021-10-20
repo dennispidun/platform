@@ -7,17 +7,18 @@ import de.iip_ecosphere.platform.deviceMgt.DeviceDescriptor;
 import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistry;
 import org.thingsboard.rest.client.RestClient;
 import org.thingsboard.server.common.data.Device;
-import org.thingsboard.server.common.data.device.DeviceSearchQuery;
 import org.thingsboard.server.common.data.id.DeviceId;
+import org.thingsboard.server.common.data.page.PageData;
+import org.thingsboard.server.common.data.page.PageLink;
 
-import java.util.Collection;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 public class ThingsBoardDeviceRegistry implements DeviceRegistry {
 
+    public static final int PAGE_SIZE = 10;
+    public static final String DEVICE_TYPE = "ecs";
     private RestClient restClient;
 
     public ThingsBoardDeviceRegistry(RestClient restClient) {
@@ -30,15 +31,25 @@ public class ThingsBoardDeviceRegistry implements DeviceRegistry {
 
     @Override
     public Set<String> getIds() {
-        return restClient.findByQuery(new DeviceSearchQuery())
-                .stream()
+        return getTBDevices().stream()
                 .map(Device::getName)
                 .collect(Collectors.toSet());
     }
 
+    private List<Device> getTBDevices() {
+        List<Device> devices = new ArrayList<>();
+        int page = 0;
+        PageData<Device> devicePage = restClient.getTenantDevices(DEVICE_TYPE, new PageLink(PAGE_SIZE, page));
+        do {
+            devices.addAll(devicePage.getData());
+            devicePage = restClient.getTenantDevices(DEVICE_TYPE, new PageLink(PAGE_SIZE, page++));
+        } while(devicePage.hasNext());
+        return devices;
+    }
+
     @Override
     public Set<String> getManagedIds() {
-        return restClient.findByQuery(new DeviceSearchQuery())
+        return getTBDevices()
                 .stream()
                 .map(d -> d.getId().toString())
                 .collect(Collectors.toSet());
@@ -46,7 +57,7 @@ public class ThingsBoardDeviceRegistry implements DeviceRegistry {
 
     @Override
     public Collection<? extends DeviceDescriptor> getDevices() {
-        return restClient.findByQuery(new DeviceSearchQuery())
+        return getTBDevices()
                 .stream()
                 .map(d -> new ThingsBoardDeviceDescriptor(d, this.restClient))
                 .collect(Collectors.toSet());
@@ -76,6 +87,7 @@ public class ThingsBoardDeviceRegistry implements DeviceRegistry {
         Device tbDevice = this.restClient.getTenantDevice(id).orElse(null);
         if (tbDevice == null) {
             Device device = new Device();
+            device.setType(DEVICE_TYPE);
             device.setName(id);
             tbDevice = this.restClient.saveDevice(device);
         }

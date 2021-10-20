@@ -12,8 +12,8 @@
 
 package de.iip_ecosphere.platform.ecsRuntime;
 
-import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryAasClient;
 import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryClient;
+import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryClientFactory;
 import de.iip_ecosphere.platform.ecsRuntime.ssh.RemoteAccessServer;
 import de.iip_ecosphere.platform.ecsRuntime.ssh.RemoteAccessServerFactory;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
@@ -41,7 +41,7 @@ public class DeviceManagement {
      * @throws IOException if the resource submodel is not available.
      */
     public static DeviceRegistryClient getRegistryClient() throws IOException {
-        return new DeviceRegistryAasClient();
+        return DeviceRegistryClientFactory.createDeviceRegistryClient();
     }
 
     /**
@@ -60,7 +60,8 @@ public class DeviceManagement {
      */
     public static void initializeDevice() {
         try {
-            DeviceRegistryClient registryClient = getRegistryClient();
+            DeviceRegistryClient registryClient = DeviceRegistryClientFactory
+                    .createDeviceRegistryClient();
             SubmodelElementCollection device = registryClient.getDevice(Id.getDeviceIdAas());
 
             if (null == device) {

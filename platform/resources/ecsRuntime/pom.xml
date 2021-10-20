@@ -26,7 +26,13 @@
     </dependency>
     <dependency>
       <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>deviceMgt.api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
       <artifactId>deviceMgt</artifactId>
+      <scope>test</scope>
       <version>${project.version}</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.apache.sshd/sshd-core -->

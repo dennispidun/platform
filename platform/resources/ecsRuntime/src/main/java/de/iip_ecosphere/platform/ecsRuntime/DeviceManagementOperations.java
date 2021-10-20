@@ -1,5 +1,6 @@
 package de.iip_ecosphere.platform.ecsRuntime;
 
+import de.iip_ecosphere.platform.deviceMgt.Credentials;
 import de.iip_ecosphere.platform.ecsRuntime.ssh.RemoteAccessServer;
 
 import java.util.concurrent.ExecutionException;
@@ -18,7 +19,7 @@ public interface DeviceManagementOperations {
      * @return credentials for the remote access server
      * @throws ExecutionException if the execution fails
      */
-    RemoteAccessServer.Credentials createRemoteConnectionCredentials() throws ExecutionException;
+    Credentials createRemoteConnectionCredentials() throws ExecutionException;
 
     /**
      * Gets the runtimeName of the device.

@@ -21,7 +21,7 @@ import static org.mockito.Mockito.mock;
  *
  * @author Dennis Pidun, University of Hildesheim
  */
-public class StubDeviceManagement implements DeviceManagement {
+public class StubDeviceManagement implements DeviceFirmwareOperations, DeviceResourceConfigOperations, DeviceRemoteManagementOperations {
 
     private static DeviceRemoteManagementOperations managementOperationsStub;
     private static DeviceFirmwareOperations firmwareOperationsStub;

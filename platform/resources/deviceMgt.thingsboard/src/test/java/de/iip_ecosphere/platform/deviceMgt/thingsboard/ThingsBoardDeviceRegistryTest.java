@@ -13,6 +13,7 @@ import org.thingsboard.rest.client.RestClient;
 import org.thingsboard.server.common.data.Device;
 import org.thingsboard.server.common.data.device.DeviceSearchQuery;
 import org.thingsboard.server.common.data.id.DeviceId;
+import org.thingsboard.server.common.data.page.PageData;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -45,8 +46,13 @@ public class ThingsBoardDeviceRegistryTest {
         devices.add(d1);
         devices.add(d2);
 
+        PageData<Device> pageData = mock(PageData.class);
+        when(pageData.hasNext()).thenReturn(false); // only one page
+        when(pageData.getData()).thenReturn(devices);
 
-        when(thingsBoardMock.findByQuery(any(DeviceSearchQuery.class))).thenReturn(devices);
+        when(thingsBoardMock.getTenantDevices(
+                eq(ThingsBoardDeviceRegistry.DEVICE_TYPE), any()))
+                .thenReturn(pageData);
 
         Set<String> ids = deviceRegistry.getIds();
 
@@ -65,7 +71,14 @@ public class ThingsBoardDeviceRegistryTest {
         d2.setName(ANOTHER_DEVICE);
         devices.add(d1);
         devices.add(d2);
-        when(thingsBoardMock.findByQuery(any(DeviceSearchQuery.class))).thenReturn(devices);
+
+        PageData<Device> pageData = mock(PageData.class);
+        when(pageData.hasNext()).thenReturn(false); // only one page
+        when(pageData.getData()).thenReturn(devices);
+
+        when(thingsBoardMock.getTenantDevices(
+                eq(ThingsBoardDeviceRegistry.DEVICE_TYPE), any()))
+                .thenReturn(pageData);
 
         Set<String> ids = deviceRegistry.getManagedIds();
 
@@ -84,8 +97,14 @@ public class ThingsBoardDeviceRegistryTest {
         d2.setName(ANOTHER_DEVICE);
         devices.add(d1);
         devices.add(d2);
-        when(thingsBoardMock.findByQuery(any(DeviceSearchQuery.class))).thenReturn(devices);
 
+        PageData<Device> pageData = mock(PageData.class);
+        when(pageData.hasNext()).thenReturn(false); // only one page
+        when(pageData.getData()).thenReturn(devices);
+
+        when(thingsBoardMock.getTenantDevices(
+                eq(ThingsBoardDeviceRegistry.DEVICE_TYPE), any()))
+                .thenReturn(pageData);
 
         Collection<? extends DeviceDescriptor> actualDevices = deviceRegistry.getDevices();
         Assert.assertEquals(2, actualDevices.size());
@@ -134,6 +153,7 @@ public class ThingsBoardDeviceRegistryTest {
     public void addDevice_withValidDevice_addsADevice() throws JsonProcessingException {
         DeviceId id = new DeviceId(UUID.randomUUID());
         Device device = new Device();
+        device.setType(ThingsBoardDeviceRegistry.DEVICE_TYPE);
         device.setName(A_DEVICE);
         when(thingsBoardMock.saveDevice(eq(device))).thenAnswer((a) -> {
             Device d = a.getArgument(0);
