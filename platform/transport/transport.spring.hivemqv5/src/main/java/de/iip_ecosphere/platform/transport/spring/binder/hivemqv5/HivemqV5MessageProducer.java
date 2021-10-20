@@ -24,17 +24,14 @@ import org.springframework.messaging.Message;
 public class HivemqV5MessageProducer extends MessageProducerSupport {
 
     private final ConsumerDestination destination;
-    private HivemqV5Client client;
     
     /**
      * Creates a message producer instance.
      * 
      * @param destination the consumer destination
-     * @param client the client instance
      */
-    public HivemqV5MessageProducer(ConsumerDestination destination, HivemqV5Client client) {
+    public HivemqV5MessageProducer(ConsumerDestination destination) {
         this.destination = destination;
-        this.client = client;
     }
     
     /**
@@ -54,12 +51,12 @@ public class HivemqV5MessageProducer extends MessageProducerSupport {
 
     @Override
     public void doStart() {
-        client.subscribeTo(destination.getName(), new Callback());
+        HivemqV5Client.subscribeTo(destination.getName(), new Callback());
     }
 
     @Override
     protected void doStop() {
-        client.unsubscribeFrom(destination.getName());
+        HivemqV5Client.unsubscribeFrom(destination.getName());
     }
 
 }

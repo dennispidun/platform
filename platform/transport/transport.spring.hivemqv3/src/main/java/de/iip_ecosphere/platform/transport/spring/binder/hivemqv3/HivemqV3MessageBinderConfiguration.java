@@ -30,8 +30,6 @@ import de.iip_ecosphere.platform.transport.spring.BeanHelper;
 @EnableConfigurationProperties(HivemqV3Configuration.class)
 public class HivemqV3MessageBinderConfiguration {
 
-    private HivemqV3Client client = new HivemqV3Client(); // no autowiring, shall stay a local instance
-    
     /**
      * Returns the binder provisioner.
      * 
@@ -40,7 +38,7 @@ public class HivemqV3MessageBinderConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public HivemqV3MessageBinderProvisioner hivemqv3BinderProvisioner() {
-        return new HivemqV3MessageBinderProvisioner(client);
+        return new HivemqV3MessageBinderProvisioner();
     }
 
     /**
@@ -52,7 +50,7 @@ public class HivemqV3MessageBinderConfiguration {
     @Bean
     @ConditionalOnMissingBean // name of this method must be the same as in META-INF/spring.binders
     public HivemqV3MessageBinder hivemqv3Binder(HivemqV3MessageBinderProvisioner messageBinderProvisioner) {
-        return new HivemqV3MessageBinder(null, messageBinderProvisioner, client);
+        return new HivemqV3MessageBinder(null, messageBinderProvisioner);
     }
 
     /**

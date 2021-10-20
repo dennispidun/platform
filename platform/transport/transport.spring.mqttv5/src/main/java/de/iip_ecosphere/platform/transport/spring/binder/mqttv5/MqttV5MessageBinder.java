@@ -28,33 +28,28 @@ import org.springframework.messaging.MessageHandler;
 public class MqttV5MessageBinder extends AbstractMessageChannelBinder<ConsumerProperties, ProducerProperties, 
     MqttV5MessageBinderProvisioner> {
 
-    private MqttClient client;
-    
     /**
      * Creates a message binder instance.
      * 
      * @param headersToEmbed the headers to embed
      * @param provisioningProvider the provisioning provider including the destination information
-     * @param client thie client instance
      */
-    public MqttV5MessageBinder(String[] headersToEmbed, MqttV5MessageBinderProvisioner provisioningProvider, 
-        MqttClient client) {
+    public MqttV5MessageBinder(String[] headersToEmbed, MqttV5MessageBinderProvisioner provisioningProvider) {
         super(headersToEmbed, provisioningProvider);
-        this.client = client;
     }
 
     @Override
     protected MessageHandler createProducerMessageHandler(ProducerDestination destination,
             ProducerProperties producerProperties, MessageChannel errorChannel) throws Exception {
         return message -> {
-            client.send(destination.getName(), (byte[]) message.getPayload());
+            MqttClient.send(destination.getName(), (byte[]) message.getPayload());
         };
     }
 
     @Override
     protected MessageProducer createConsumerEndpoint(ConsumerDestination destination, String group,
             ConsumerProperties properties) throws Exception {
-        return new MqttV5MessageProducer(destination, client);
+        return new MqttV5MessageProducer(destination);
     }
 
 }
