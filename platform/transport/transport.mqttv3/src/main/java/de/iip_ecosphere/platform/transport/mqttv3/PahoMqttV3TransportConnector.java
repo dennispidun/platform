@@ -174,12 +174,20 @@ public class PahoMqttV3TransportConnector extends AbstractMqttTransportConnector
         return NAME;
     }
 
-    @Override
+    /**
+     * Returns the supported encryption mechanisms.
+     * 
+     * @return the supported encryption mechanisms, may be <b>null</b> or empty
+     */
     public String supportedEncryption() {
         return SslUtils.CONTEXT_ALG_TLS;
     }
 
-    @Override
+    /**
+     * Returns the actually enabled encryption mechanisms on this instance.
+     * 
+     * @return the enabled encryption mechanisms, may be <b>null</b> or empty
+     */
     public String enabledEncryption() {
         return tlsEnabled ? SslUtils.CONTEXT_ALG_TLS : null;
     }

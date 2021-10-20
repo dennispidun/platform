@@ -67,6 +67,7 @@ public class PahoMqttV5TransportConnectorTest {
             }
         });
     }
+
     
     /**
      * Performs the test.
