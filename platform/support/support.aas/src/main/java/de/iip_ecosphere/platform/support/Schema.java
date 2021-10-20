@@ -33,11 +33,6 @@ public enum Schema {
      * TCP unencrypted.
      */
     TCP("tcp://", false),
-
-    /**
-     * TCP TLS-encrypted.
-     */
-    SSL("ssl://", true),
     
     /**
      * Use whatever you like.
