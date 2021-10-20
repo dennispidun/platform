@@ -10,11 +10,9 @@ The platform concepts and realization are developed by the IIP-Ecosphere consort
 
 All material is also available from the [IIP-Ecosphere Website](https://www.iip-ecosphere.eu/).
 
-## Documentatio
+## Documentation and release overview
 
-For detailed documentation and development hints see [documentation overview](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/README.md). For a documentation of the releases of the IIP-Ecosphere platform see [releases overview](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/RELEASES.md). For information on using/installing the platform, please consult the [installation overview](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/INSTALL.md). 
-
-We also prepare a set of [examples and demonstration use cases](https://github.com/iip-ecosphere/platform/tree/main/platform/examples/README.md).
+For detailed documentation and development hints see [documentation overview](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/README.md). For a documentation of the releases of the IIP-Ecosphere platform see [releases overview](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/RELEASES.md).
 
 ## Available components
 
@@ -53,7 +51,6 @@ The following layers and components of the IIP-Ecosphere are available in this p
     * IVML platform [configuration](https://github.com/iip-ecosphere/platform/tree/main/platform/configuration/configuration/README.md)
     * resource optimization
     * adaptation
-    
 
 Released components are made available via [Maven Central](https://search.maven.org/search?q=iip-ecosphere).
 
