@@ -289,6 +289,10 @@ public class ConnectorTest {
             }
             
             @Override
+            public void monitor(String... qName) throws IOException {
+            }
+            
+            @Override
             public <T> T getStruct(String qName, Class<T> type) throws IOException {
                 return null;
             }
@@ -306,19 +310,6 @@ public class ConnectorTest {
             @Override
             public Object call(String qName, Object... args) throws IOException {
                 return null;
-            }
-
-            @Override
-            public void monitor(int notificationInterval, String... qNames) throws IOException {
-            }
-
-            @Override
-            public void monitorModelChanges(int notificationInterval) throws IOException {
-            }
-
-            @Override
-            protected ConnectorParameter getConnectorParameter() {
-                return null; // unused
             }
         };
 
