@@ -8,7 +8,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
-package de.iip_ecosphere.platform.deviceMgt;
+package de.iip_ecosphere.platform.deviceMgt.thingsboard;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -20,7 +20,7 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    AppTest.class,
+        ThingsBoardDeviceRegistryTest.class,
 })
 public class AllTests {
 }
