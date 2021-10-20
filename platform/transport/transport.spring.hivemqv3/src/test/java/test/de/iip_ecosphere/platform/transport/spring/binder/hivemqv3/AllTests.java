@@ -21,7 +21,7 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    HivemqV3MessageBinderTest.class,
+    HivemqV3MessageBinderTest.class
 })
 public class AllTests {
 }
