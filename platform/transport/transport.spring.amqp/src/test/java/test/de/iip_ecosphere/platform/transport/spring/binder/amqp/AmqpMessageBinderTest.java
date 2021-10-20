@@ -11,7 +11,6 @@
 
 package test.de.iip_ecosphere.platform.transport.spring.binder.amqp;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -63,50 +62,12 @@ import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
 @RunWith(SpringRunner.class)
 public class AmqpMessageBinderTest {
 
-    private static ServerAddress addr = new ServerAddress(Schema.IGNORE); // localhost, ephemeral port
+    private static final ServerAddress ADDR = new ServerAddress(Schema.IGNORE); // localhost, ephemeral port
     private static TestQpidServer server;
     private static String received;
-    private static File secCfg;
 
     @Autowired
     private TransportParameter params;
-    
-    /**
-     * Defines the secure config folder.
-     * 
-     * @param folder the folder, used instead of the default config folder if not <b>null</b>
-     */
-    protected static void setSecCfg(File folder) {
-        secCfg = folder;
-    }
-
-    /**
-     * Returns the keystore if {@link #secCfg} is set.
-     * 
-     * @return the keystore, <b>null</b> if {@link #secCfg} is <b>null</b>
-     */
-    protected static File getKeystore() {
-        return null == secCfg ? null : new File(secCfg, "keystore.jks");
-    }
-    
-    /**
-     * Returns the keystore password if {@link #secCfg} is set.
-     * 
-     * @return the keystore password, <b>null</b> if {@link #secCfg} is <b>null</b>
-     */
-    protected static String getKeystorePassword() {
-        return null == secCfg ? null : TestQpidServer.KEYSTORE_PASSWORD;
-    }
-    
-    /**
-     * Rests the broker address.
-     * 
-     * @return the new broker address
-     */
-    protected static ServerAddress resetAddr() {
-        addr = new ServerAddress(Schema.IGNORE); // localhost, ephemeral port
-        return addr;
-    }
     
     /**
      * An initializer to override certain configuration values, in particular dynamic ports.
@@ -118,7 +79,7 @@ public class AmqpMessageBinderTest {
         @Override
         public void initialize(ConfigurableApplicationContext applicationContext) {
             TestPropertyValues
-                .of("amqp.port=" + addr.getPort())
+                .of("amqp.port=" + ADDR.getPort())
                 .applyTo(applicationContext);
         }
         
@@ -131,8 +92,7 @@ public class AmqpMessageBinderTest {
      */
     @BeforeClass
     public static void init() {
-        TestQpidServer.setConfigDir(secCfg);
-        server = new TestQpidServer(addr);
+        server = new TestQpidServer(ADDR);
         server.start();
         TimeUtils.sleep(1000);
         SerializerRegistry.registerSerializer(StringSerializer.class);
@@ -145,11 +105,7 @@ public class AmqpMessageBinderTest {
             
         };
         try {
-            TransportParameterBuilder tpBuilder = TransportParameterBuilder.newBuilder(addr).setApplicationId("infra");
-            if (null != secCfg) {
-                tpBuilder.setKeystore(getKeystore(), getKeystorePassword()); 
-            }
-            infra.connect(tpBuilder.build());
+            infra.connect(TransportParameterBuilder.newBuilder(ADDR).setApplicationId("infra").build());
             infra.setReceptionCallback("amqpBinder", new ReceptionCallback<String>() {
     
                 @Override
@@ -169,7 +125,7 @@ public class AmqpMessageBinderTest {
         } catch (IOException e) {
             Assert.fail("CONNECTOR PROBLEM " + e.getMessage());
         }
-        System.out.println("Started infra client on " + addr.getHost() + " " + addr.getPort());
+        System.out.println("Started infra client on " + ADDR.getHost() + " " + ADDR.getPort());
         TimeUtils.sleep(1000);
     }
     
@@ -184,7 +140,6 @@ public class AmqpMessageBinderTest {
         server.stop(true);
         SerializerRegistry.unregisterSerializer(StringSerializer.class);
         SerializerRegistry.resetDefaults();
-        TestQpidServer.setConfigDir(null);
     }
     
     /**
@@ -199,7 +154,7 @@ public class AmqpMessageBinderTest {
         
         Assert.assertNotNull("The autowired transport parameters shall not be null", params);
         Assert.assertEquals("localhost", params.getHost());
-        //Assert.assertEquals(addr.getPort(), params.getPort()); // may not hold in second round
+        Assert.assertEquals(ADDR.getPort(), params.getPort());
         Assert.assertEquals("", params.getApplicationId()); // no client ids here
     }
     
